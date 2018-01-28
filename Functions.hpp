@@ -9,7 +9,9 @@ double connorXrot(double imgWidth, cv::Point centeroftarget, double fovCamera, d
 
 Point2f calculateCenter(vector<Point> contour);
 
-double emersonXrot(double imgWidth, cv::Point centeroftarget, double fovCamera, double botCenter);
+double emersonXrot(double imgWidth, cv::Point centeroftarget, double fovCamera);
+
+double calculateTY(double imgHeight, cv::Point centeroftarget, double fovCameraY);
 
 extern std::map<std::string, std::string> settings;
 

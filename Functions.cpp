@@ -8,20 +8,25 @@ using namespace std;
 using namespace cv;
 
 //xrot equation from Emerson (in degrees)
-double emersonXrot(double imgWidth, cv::Point centeroftarget, double fovCamera, double botCenter)
+double emersonXrot(double imgWidth, cv::Point centeroftarget, double fovCameraX)
 {
     double remapCenter = centeroftarget.x - imgWidth/2;
-    return remapCenter/imgWidth*fovCamera;
-
+    return remapCenter/imgWidth*fovCameraX;
 }
 
 //xrot equation from 2017 made by connor (in radians)
 double connorXrot(double imgWidth, cv::Point centeroftarget, double fovCamera, double botCenter)
 {
     double remapCenter = centeroftarget.x - imgWidth/2;
-    //the last value was added this year to fix some stuff
-    return (remapCenter / botCenter * fovCamera / (imgWidth / botCenter)) + 1.88496;
+    return (remapCenter / botCenter * fovCamera / (imgWidth / botCenter));
 }
+
+double calculateTY(double imgHeight, cv::Point centeroftarget double focCameraY)
+{
+    double remapCenter = centeroftarget.y - imgHeight/2;
+    return remapCenter/imgHeight*fovCameraY;
+}
+
 
 extern std::map<std::string, std::string> settings;
 

@@ -13,15 +13,22 @@ using namespace std;
 
 VideoCapture camera;
 
-//constents
-double widthOfHex = 39.25;
-//double focalLength = 319.97856484;
-double focalLength = 309.15445743;
-double targetHeight = 91;
-double camFov = 120;
+//constents: need to be changed when camera moves/replaced
+double tYOffset = 0;
 double camHeight =  24.25;
+//double focalLength = 319.97856484;
+//double focalLength = 309.15445743;
+//double robotCenter = 10.795;
+
+//Won't need changed
+double widthOfHex = 39.25;
+double targetHeight = 91;
 double cameraHexDif = targetHeight - camHeight;
-double robotCenter = 10.795;
+
+//may need changed
+double FovX = 120;
+double FovY = 72.05474677;
+
 
 //basic thresh value
 int tMin = 100;
@@ -134,11 +141,13 @@ void runCamera(Mat base)
 
 		//find and send values
 		//use cam fov to find ty and use travis' idea
-
-		double distance = (widthOfHex * focalLength) / width;			
-		double Xrot = emersonXrot(imgWidth, centerOfTarget, camFov, robotCenter);
-		double distanceToBase = sqrt(pow(distance, 2.0) - pow(cameraHexDif, 2.0));
 		
+		double tY = calculateTY(imgHeight, centerOfTarget, FovY);
+		//double distance = (widthOfHex * focalLength) / width;			
+		double Xrot = emersonXrot(imgWidth, centerOfTarget, FovX);
+		//double distanceToBase = sqrt(pow(distance, 2.0) - pow(cameraHexDif, 2.0));
+		double distToTarget = cameraHexDif/sin(tY+tYOffset);
+
 		cout << to_string(tMin) << endl;
 		if(distance && distanceToBase < 500){
 			cout << "Distance to target center: " + to_string(distance) << endl;
