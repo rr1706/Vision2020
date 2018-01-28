@@ -71,7 +71,8 @@ int main(int argc, char **argv)
 		flip(base, base, 0); //only needed if cam is upside down
 		gbase = cuda::GpuMat(base);
 		//cuda::resize(gbase, smol, Size(920,400), 0, 0, INTER_AREA);
-		runCamera(gbase);
+		thread t(runCamera, gbase);
+		t.join();
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -98,15 +99,15 @@ void runCamera(cuda::GpuMat gbase)
 	base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
-	thread th1(erode, threshed, threshed, kernel); //look into reducing this to one line
-	thread th2(erode, threshed, threshed, kernel);
+	erode(threshed, threshed, kernel); //look into reducing this to one line
+	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 
 	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef WITH_HEAD
-	thread th4 (drawContours, base, contours, -1, Scalar(255, 10, 100), 1);
+	drawContours(base, contours, -1, Scalar(255, 10, 100), 1);
 	#endif
 
 
@@ -174,11 +175,6 @@ void runCamera(cuda::GpuMat gbase)
 		cout << " " << endl;
 
 	}
-
-	th1.join();
-	th2.join();
-	th4.join();
-
 	//show final images
 	#ifdef WITH_HEAD
 	imshow("Normal", base);

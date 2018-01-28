@@ -13,4 +13,4 @@
 /usr/bin/v4l2-ctl -c backlight_compensation=1
 /usr/bin/v4l2-ctl -c exposure_auto=1
 /usr/bin/v4l2-ctl -c exposure_absolute=5000
-/usr/bin/v4l2-ctl --set-fmt-video=width=640,height=360,pixelformat=YUYV4
+/usr/bin/v4l2-ctl --set-fmt-video=width=320,height=120,pixelformat=YUYV4
