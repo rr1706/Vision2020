@@ -4,6 +4,9 @@
 #include <cmath>
 #include "Functions.hpp"
 #include "Network.hpp"
+//#include <boost/filesystem>
+#include <unistd.h>
+#include <opencv2/core/utils/filesystem.hpp>
 
 using namespace cv;
 using namespace std;
@@ -120,8 +123,10 @@ void runCamera(Mat base)
 
 int main(int argc, char** argv)
 {
+	while(!utils::fs::exists("/dev/video0")){
+		usleep(500000);
+	}
 
-	waitKey(30);
 	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
 	
 	startTable();
