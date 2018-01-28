@@ -1,6 +1,7 @@
 [Unit]
 Description=Ratchet Rockers 2020 Vision Solution
-After=network.target
+BindsTo=dev-video0-device
+After=dev-video0.device
 
 [Service]
 Type=simple
