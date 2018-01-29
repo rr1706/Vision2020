@@ -159,9 +159,9 @@ int main(int argc, char** argv)
 	while(!utils::fs::exists("/dev/video0")){
 		usleep(500000);
 	}
-/*
-	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
-	*/
+
+	//system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
+	
 	loadConfig("settings.conf");
 	startTable();
 	camera.open(0);
