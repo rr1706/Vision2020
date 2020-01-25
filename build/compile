@@ -1,0 +1,6 @@
+#!/bin/bash
+sudo pkill vision
+cmake .. -DHEADLESS=ON
+sudo make install -j4
+sudo make -j4
+

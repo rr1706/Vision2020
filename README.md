@@ -1,0 +1,3 @@
+Rachet Rackers Vision Solution For 2020
+
+Used to track the hexgon target using the bottom three pieces of tape. This program will give X rotation for the robot, distance to the base wall, and direct distance to target. To compile on a linux computer use the run file in terminal then use reset to allow it to run on start up. To run of a windows machine I left the .vscode folder but it is missing the ability to link to network tables, may or may not be fixed later. this was run using an IR camera(modified genius 120) on a rPi using stantard Raspian(not FRC pi though it may work for that).
