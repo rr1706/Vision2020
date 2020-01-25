@@ -1,0 +1,7 @@
+/home/pi/Documents/vision2020/build/CMakeFiles/install/strip.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/edit_cache.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/vision2020.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/list_install_components.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/install.dir
+/home/pi/Documents/vision2020/build/CMakeFiles/install/local.dir

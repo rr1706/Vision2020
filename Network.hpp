@@ -1,7 +1,8 @@
-#include "ntcore.h"
-#include "networktables/NetworkTable.hpp"
+//#include "ntcore.h"
+//#include "networktables/NetworkTable.h"
+#include "string"
 
-using std::shared_ptr;
+using namespace std;
 
-shared_ptr<NetworkTable> myTable = NetworkTable::getTable("Network");
-void sendDouble(string entry, double input);
+void sendMessage(string entry, double input);
+

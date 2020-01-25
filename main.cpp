@@ -47,7 +47,7 @@ void runCamera(Mat base, Mat second)
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef HEADLESS
 	drawContours(base, contours, -1, Scalar(0, 255, 0), 1);
-	#endif HEADLESS
+	#endif
 	
 	//only complete if a countour is found
 	for (auto contour : contours) {
@@ -56,7 +56,7 @@ void runCamera(Mat base, Mat second)
 		//RotatedRect rotatedBound = minAreaRect(contour);
 		#ifdef HEADLESS
 		rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
-		#endif HEADLESS
+		#endif
 		/*// test values
 		if (rotatedBound.size.width < 1 || rotatedBound.size.height < 1)
 			continue;
@@ -75,20 +75,19 @@ void runCamera(Mat base, Mat second)
 		}*/
 		
 		int width = bound.width;
-		int height = bound.height;
 
 		//finds target center and places crosshair
 		Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
 		#ifdef HEADLESS
 		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		#endif HEADLESS
+		#endif
 
 		//Draw crosshair on the center of the image
 		int imgWidth = base.cols;
 		int imgHeight = base.rows;
 		#ifdef HEADLESS
 		drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		#endif HEADLESS
+		#endif
 
 		//find and send values
 		double distance = (widthOfHex * focalLength) / width;			
@@ -108,7 +107,7 @@ void runCamera(Mat base, Mat second)
 	#ifdef HEADLESS
 	cv::imshow("Normal", base);
 	cv::imshow("Thresh", threshed);
-	#endif HEADLESS
+	#endif
 }
 
 int main(int argc, char** argv)
