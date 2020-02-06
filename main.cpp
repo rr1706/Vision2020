@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 		camera >> base;
 		flip(base, base, 0); //only needed if cam is upside down
 		gbase = cuda::GpuMat(base);
-		cuda::resize(gbase, smol, Size(960, 720), 0, 0, INTER_AREA);
+		cuda::resize(gbase, smol, Size(600, 600), 0, 0, INTER_AREA);
 		runCamera(smol);
 		esc = waitKey(33);
 		if (esc == 27) {
