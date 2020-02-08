@@ -3,11 +3,9 @@
 #include "networktables/NetworkTableInstance.h"
 #include "Network.hpp"
 #include "string"
-//#include <StringRef.h>
 
 using std::shared_ptr;
 using namespace std;
-//using namespace wpi;
 
 shared_ptr<NetworkTable> myTable;
 
@@ -20,4 +18,8 @@ void startTable(){
 
 void sendMessage(string entryName, double input){
 	myTable->PutNumber(entryName, input);
+}
+
+void sendString(string entryName, string input){
+	myTable->PutString(entryName, input);
 }

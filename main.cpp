@@ -1,4 +1,4 @@
-
+//currently testing split color chanels and shape tracking
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include <cmath>
@@ -22,83 +22,75 @@ double camHeight =  29.75;
 double cameraHexDif = targetHeight - camHeight;
 double robotCenter = 10.795;
 
-//threshing value, will need to be changed if you use something other then ir or gray scale
+//threshing values, pick one
+
+//basic thresh value
 int tMin = 100;
+//BGR thresh values
+Scalar upperVals = Scalar(255,200,200);
+Scalar lowerVals = Scalar(255,30,30);
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
 Mat kernel = (cv::Mat_<unsigned char>(3,3) << 1,0,1,0,1,0,1,0,1);
 
 
-void runCamera(Mat base, Mat second)
+void runCamera(Mat base)
 {	
 	//used for a threshed image
-	Mat threshed;
+	Mat threshed, splitChannels[3];
 
 	//used in contours
 	vector<vector<Point2i>> contours;
 	vector<Vec4i> hierarchy;
-	vector<Point2i> last_contours;
+	//vector<Point2i> contour;
 
-	//note: optimize threshing
-	threshold(second, threshed, tMin, 255, THRESH_BINARY); //try adaptive threshold
+	//split color channels
+	split(base, splitChannels);
+
+	//note: optimize threshing and pick one
+	threshold(splitChannels[0], threshed, tMin, 255, THRESH_BINARY); //try adaptive threshold
+	//inRange(base, lowerVals, upperVals, threshed);
 	dilate(threshed, threshed, kernel);
 	erode(threshed, threshed, kernel);
 
     //contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-	#ifdef HEADLESS
+	#ifdef HEAD
 	drawContours(base, contours, -1, Scalar(0, 255, 0), 1);
 	#endif
+	
 	if(contours.size()<1){
-	tMin=65;
+		tMin=65;
 	}
+	
 	//only complete if a countour is found
-	for (auto contour : contours){
+	for (vector<Point2i> contour : contours){
 
 		if(contourArea(contour) > 300){
-                	
-			tMin = 220;
-                }
+            tMin = 85;
+        }
 		if(contourArea(contour) < 50|| contours.size() < 1){
-                        tMin = 65;
-                }
+            tMin = 50;
+		}
 
-		cout << contourArea(contour)<<endl;
 		//bounding box
 		Rect bound = boundingRect(contour);
-		//RotatedRect rotatedBound = minAreaRect(contour);
-		#ifdef HEADLESS
+		#ifdef HEAD
 		rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
 		#endif
-		/*// test values
-		if (rotatedBound.size.width < 1 || rotatedBound.size.height < 1)
-			continue;
-
-		Point2f vertices[4];
-		rotatedBound.points(vertices);	
-
-		{ // draw the rotated rectangle
-			vector<vector<Point2i> > drawRot;
-			vector<Point2i> rot;
-			for (int i = 0; i < 4; ++i)
-				rot.push_back(vertices[i]);
-			drawRot.push_back(rot);
-
-			drawContours(base, drawRot, -1, cv::Scalar(0,0,255));
-		}*/
 		
 		int width = bound.width;
 
 		//finds target center and places crosshair
 		Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
-		#ifdef HEADLESS
+		#ifdef HEAD
 		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 		#endif
 
 		//Draw crosshair on the center of the image
 		int imgWidth = base.cols;
 		int imgHeight = base.rows;
-		#ifdef HEADLESS
+		#ifdef HEAD
 		drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 		#endif
 
@@ -108,7 +100,7 @@ void runCamera(Mat base, Mat second)
 		double distanceToBase = sqrt(pow(distance, 2.0) - pow(cameraHexDif, 2.0));
 		
 		cout << to_string(tMin) << endl;
-		if(distance || distanceToBase < 500){
+		if(distance && distanceToBase < 500){
 			cout << "Distance to target center: " + to_string(distance) << endl;
 			sendMessage("targetDist", distance);
 			cout << "XRot: " << to_string(Xrot) << endl;
@@ -119,29 +111,31 @@ void runCamera(Mat base, Mat second)
 		}
 	}
 	//show final images
-	#ifdef HEADLESS
+	#ifdef HEAD
 	imshow("Normal", base);
 	imshow("Thresh", threshed);
-	imshow("gray", second);
+	imshow("B", splitChannels[0]);
+	imshow("G", splitChannels[1]);
+	imshow("R", splitChannels[2]);
 	#endif
 }
 
 int main(int argc, char** argv)
 {
 	startTable();
-	camera.open(0);
-	//note: make sure this isn't broken
-	//camera.set(CAP_PROP_EXPOSURE, 1);
-	//camera.set(CAP_PROP_AUTO_EXPOSURE, 1000);
+	camera.open(1);
+	sendString("On?", "Yes");
+	//note: use this only for windows, on linux use qv4vl (<- fix spelling)
+	/*camera.set(CAP_PROP_EXPOSURE, 1);
+	camera.set(CAP_PROP_AUTO_EXPOSURE, 1000);*/
 
 	//display with with camera
 	Mat base, gray;
 	while(camera.isOpened())
 	{
 		camera >> base;
-		//flip(base, base, 0); //only needed if cam is upside down
-        	cvtColor(base, gray, COLOR_BGR2GRAY);
-        	runCamera(base, gray);
+		flip(base, base, 0); //only needed if cam is upside down
+        runCamera(base);
 
 		esc = waitKey(33);
 		if (esc == 27)
@@ -149,6 +143,7 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
+	sendString("On?", "No");
 	camera.release();
 	return 0;
 }
