@@ -18,7 +18,7 @@ if(CUDA_VERSION)
 endif(CUDA_VERSION)
 
 if(HEAD)
-	add_definitions(-DHEADLESS)
+	add_definitions(-DHEAD)
 endif(HEAD)
 
 file(GLOB srcs ./*.cpp ./*.h*)

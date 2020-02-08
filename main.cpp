@@ -60,17 +60,17 @@ void runCamera(Mat base)
 	#endif
 	
 	if(contours.size()<1){
-		tMin=65;
+		tMin=70;
 	}
 	
 	//only complete if a countour is found
 	for (vector<Point2i> contour : contours){
 
 		if(contourArea(contour) > 300){
-            tMin = 85;
+            tMin = 80;
         }
 		if(contourArea(contour) < 50|| contours.size() < 1){
-            tMin = 50;
+            tMin = 70;
 		}
 
 		//bounding box
@@ -115,22 +115,21 @@ void runCamera(Mat base)
 	imshow("Normal", base);
 	imshow("Thresh", threshed);
 	imshow("B", splitChannels[0]);
-	imshow("G", splitChannels[1]);
-	imshow("R", splitChannels[2]);
 	#endif
 }
 
 int main(int argc, char** argv)
 {
+	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
 	startTable();
-	camera.open(1);
+	camera.open(0);
 	sendString("On?", "Yes");
 	//note: use this only for windows, on linux use qv4vl (<- fix spelling)
-	/*camera.set(CAP_PROP_EXPOSURE, 1);
-	camera.set(CAP_PROP_AUTO_EXPOSURE, 1000);*/
+	//camera.set(CAP_PROP_EXPOSURE, 0.1);
+	//camera.set(CAP_PROP_AUTO_EXPOSURE, 0.1);
 
 	//display with with camera
-	Mat base, gray;
+	Mat base;
 	while(camera.isOpened())
 	{
 		camera >> base;
