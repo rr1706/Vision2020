@@ -120,13 +120,17 @@ void runCamera(Mat base)
 
 int main(int argc, char** argv)
 {
+
+	waitKey(30);
 	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
+	
 	startTable();
 	camera.open(0);
 	sendString("On?", "Yes");
-	//note: use this only for windows, on linux use qv4vl (<- fix spelling)
-	//camera.set(CAP_PROP_EXPOSURE, 0.1);
-	//camera.set(CAP_PROP_AUTO_EXPOSURE, 0.1);
+	
+	//note: adjust
+	//camera.set(CAP_PROP_EXPOSURE, 1);
+	//camera.set(CAP_PROP_AUTO_EXPOSURE, 10);
 
 	//display with with camera
 	Mat base;
