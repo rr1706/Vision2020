@@ -67,9 +67,9 @@ void runCamera(Mat base)
 	for (vector<Point2i> contour : contours){
 
 		if(contourArea(contour) > 300){
-            tMin = 80;
+            tMin = 200;
         }
-		if(contourArea(contour) < 50|| contours.size() < 1){
+		if(contourArea(contour) < 70 || contours.size() < 1){
             tMin = 70;
 		}
 
