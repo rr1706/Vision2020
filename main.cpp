@@ -4,7 +4,6 @@
 #include <cmath>
 #include "Functions.hpp"
 #include "Network.hpp"
-//#include <boost/filesystem>
 #include <unistd.h>
 #include <opencv2/core/utils/filesystem.hpp>
 
@@ -18,10 +17,11 @@ char esc;
 
 //constents
 double widthOfHex = 39.25;
-double focalLength = 308.46268657;
+//double focalLength = 319.97856484;
+double focalLength = 309.15445743;
 double targetHeight = 91;
 double camFov = 120;
-double camHeight =  29.75;
+double camHeight =  24.25;
 double cameraHexDif = targetHeight - camHeight;
 double robotCenter = 10.795;
 
@@ -130,12 +130,12 @@ int main(int argc, char** argv)
 	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
 	
 	startTable();
-	camera.open(0);
+	camera.open(1);
 	sendString("On?", "Yes");
 	
 	//note: adjust
 	//camera.set(CAP_PROP_EXPOSURE, 1);
-	//camera.set(CAP_PROP_AUTO_EXPOSURE, 10);
+	//camera.set(CAP_PROP_AUTO_EXPOSURE, -500);
 
 	//display with with camera
 	Mat base;
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
-	sendString("On?", "No");
+	//sendString("On?", "No");
 	camera.release();
 	return 0;
 }
