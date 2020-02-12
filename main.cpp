@@ -98,6 +98,8 @@ void runCamera(Mat base)
 		#endif
 
 		//find and send values
+		//use cam fov to find ty and use travis' idea
+
 		double distance = (widthOfHex * focalLength) / width;			
 		double Xrot = emersonXrot(imgWidth, centerOfTarget, camFov, robotCenter);
 		double distanceToBase = sqrt(pow(distance, 2.0) - pow(cameraHexDif, 2.0));
@@ -105,13 +107,12 @@ void runCamera(Mat base)
 		cout << to_string(tMin) << endl;
 		if(distance && distanceToBase < 500){
 			cout << "Distance to target center: " + to_string(distance) << endl;
-			sendMessage("targetDist", distance);
-			cout << "XRot: " << to_string(Xrot) << endl;
-			sendMessage("Xrot", Xrot);
+			sendMessage("targetDist", distance)
 			cout << "distance to base: " + to_string(distanceToBase) << endl;
-			sendMessage("distToBase", distanceToBase);
-			cout << " " << endl;
 		}
+		cout << "XRot: " << to_string(Xrot) << endl;
+		sendMessage("Xrot", Xrot);
+		cout << " " << endl;
 	}
 	//show final images
 	#ifdef HEAD
