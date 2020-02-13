@@ -1,5 +1,15 @@
 //currently testing split color chanels and shape tracking
 #include "opencv2/opencv.hpp"
+
+//#include <limits>
+//#include <set>
+#include <utility>
+//#include <chrono>
+//#include <numeric>
+//#include <string>
+//#include <iostream>
+#include <fstream>
+
 #include <vector>
 #include <cmath>
 #include "Functions.hpp"
@@ -35,6 +45,28 @@ Scalar lowerVals = Scalar(255,30,30);
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
 Mat kernel = (cv::Mat_<unsigned char>(3,3) << 1,0,1,0,1,0,1,0,1);
+
+extern std::map<std::string, std::string> settings;
+
+void loadConfig(string filename){
+    string line;
+    ifstream myfile(filename);
+    if (myfile.is_open())
+    {
+        while ( getline(myfile,line))
+        {
+
+            int xx = line.find('=');
+            int jf = line.size();
+            string key = line.substr(0, xx);
+            xx += 1;
+            string value = line.substr(xx, jf - xx);
+            settings[key] = value;
+        }
+        myfile.close();
+    }
+    else printf("unable to open file\n");
+}
 
 
 void runCamera(Mat base)
@@ -107,7 +139,7 @@ void runCamera(Mat base)
 		cout << to_string(tMin) << endl;
 		if(distance && distanceToBase < 500){
 			cout << "Distance to target center: " + to_string(distance) << endl;
-			sendMessage("targetDist", distance)
+			sendMessage("targetDist", distance);
 			cout << "distance to base: " + to_string(distanceToBase) << endl;
 		}
 		cout << "XRot: " << to_string(Xrot) << endl;
@@ -127,11 +159,12 @@ int main(int argc, char** argv)
 	while(!utils::fs::exists("/dev/video0")){
 		usleep(500000);
 	}
-
+/*
 	system("/usr/bin/v4l2-ctl --set-ctrl=exposure_absolute=700");
-	
+	*/
+	loadConfig("settings.conf");
 	startTable();
-	camera.open(1);
+	camera.open(0);
 	sendString("On?", "Yes");
 	
 	//note: adjust
