@@ -14,8 +14,8 @@ using namespace std;
 VideoCapture camera;
 
 //constents: need to be changed when camera moves/replaced
-double tYOffset = 0;
-double camHeight =  24.25;
+double tYOffset = 30;
+double camHeight =  22.25;
 //double focalLength = 319.97856484;
 //double focalLength = 309.15445743;
 //double robotCenter = 10.795;
@@ -140,7 +140,7 @@ void runCamera(Mat base)
 		#endif
 
 		//find and send values
-		double tY = calculateTY(imgHeight, centerOfTarget, FovY);	
+		double tY = calculateTY(imgHeight, centerOfTarget, FovY);
 		double Xrot = emersonXrot(imgWidth, centerOfTarget, FovX);
 		double distToTarget = cameraHexDif/sin(tY+tYOffset);
 
