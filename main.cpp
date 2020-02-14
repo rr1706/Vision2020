@@ -124,7 +124,7 @@ void runCamera(Mat base)
 		rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
 		#endif
 		
-		int width = bound.width;
+		//int width = bound.width;
 
 		//finds target center and places crosshair
 		Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
@@ -140,20 +140,16 @@ void runCamera(Mat base)
 		#endif
 
 		//find and send values
-		//use cam fov to find ty and use travis' idea
-		
-		double tY = calculateTY(imgHeight, centerOfTarget, FovY);
-		//double distance = (widthOfHex * focalLength) / width;			
+		double tY = calculateTY(imgHeight, centerOfTarget, FovY);	
 		double Xrot = emersonXrot(imgWidth, centerOfTarget, FovX);
-		//double distanceToBase = sqrt(pow(distance, 2.0) - pow(cameraHexDif, 2.0));
 		double distToTarget = cameraHexDif/sin(tY+tYOffset);
 
 		cout << to_string(tMin) << endl;
 		if(distance && distanceToBase < 500){
-			cout << "Distance to target center: " + to_string(distance) << endl;
-			sendMessage("targetDist", distance);
-			cout << "distance to base: " + to_string(distanceToBase) << endl;
+			cout << "Distance to target center: " + to_string(distToTarget) << endl;
+			sendMessage("targetDist", distToTarget);
 		}
+		cout << "TY: " << to_string(TY) << endl;
 		cout << "XRot: " << to_string(Xrot) << endl;
 		sendMessage("Xrot", Xrot);
 		cout << " " << endl;
