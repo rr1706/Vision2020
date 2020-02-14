@@ -21,7 +21,7 @@ double connorXrot(double imgWidth, cv::Point centeroftarget, double fovCamera, d
     return (remapCenter / botCenter * fovCamera / (imgWidth / botCenter));
 }
 
-double calculateTY(double imgHeight, cv::Point centeroftarget double focCameraY)
+double calculateTY(double imgHeight, cv::Point centeroftarget, double fovCameraY)
 {
     double remapCenter = centeroftarget.y - imgHeight/2;
     return remapCenter/imgHeight*fovCameraY;

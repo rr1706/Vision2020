@@ -145,11 +145,11 @@ void runCamera(Mat base)
 		double distToTarget = cameraHexDif/sin(tY+tYOffset);
 
 		cout << to_string(tMin) << endl;
-		if(distance && distanceToBase < 500){
+		if(distToTarget < 500){
 			cout << "Distance to target center: " + to_string(distToTarget) << endl;
-			sendMessage("targetDist", distToTarget);
+			sendMessage("Distance", distToTarget);
 		}
-		cout << "TY: " << to_string(TY) << endl;
+		cout << "tY: " << to_string(tY) << endl;
 		cout << "XRot: " << to_string(Xrot) << endl;
 		sendMessage("Xrot", Xrot);
 		cout << " " << endl;
