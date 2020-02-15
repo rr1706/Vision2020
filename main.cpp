@@ -1,12 +1,14 @@
 #include "opencv2/opencv.hpp"
 #include <utility>
-#include <fstream>
 #include <vector>
 #include <cmath>
 #include "Functions.hpp"
+#include <opencv2/core/utils/filesystem.hpp>
+#include <fstream>
+#ifdef LINUX
 #include "Network.hpp"
 #include <unistd.h>
-#include <opencv2/core/utils/filesystem.hpp>
+#endif
 
 using namespace cv;
 using namespace std;
@@ -41,14 +43,17 @@ void runCamera(Mat base);
 //press esc key to close program
 char esc;
 
+#ifdef LINUX
 std::map<std::string, std::string> settings = {
     {"mode", "run"},
     {"frontCam", "/dev/video0"}
 };
+#endif
 
 
 int main(int argc, char** argv)
 {
+	#ifdef LINUX
 	while(!utils::fs::exists("/dev/video0")){
 		usleep(500);
 	}
@@ -57,8 +62,12 @@ int main(int argc, char** argv)
 	system(("v4l2ctrl -d " + settings["frontCam"] + " -l CamSettings.conf").c_str());
 
 	startTable();
+	#endif
+
 	camera.open(0);
+	#ifdef LINUX
 	sendString("On?", "Yes");
+	#endif
 
 	//display with with camera
 	Mat base;
@@ -74,7 +83,9 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
+	#ifdef LINUX
 	sendString("On?", "No");
+	#endif
 	camera.release();
 	return 0;
 }
@@ -87,7 +98,7 @@ void runCamera(Mat base)
 	//used in contours
 	vector<vector<Point2i>> contours;
 	vector<Vec4i> hierarchy;
-	//vector<Point2i> contour;
+	vector<Point2i> hull;
 
 	//split color channels
 	split(base, splitChannels);
@@ -118,41 +129,54 @@ void runCamera(Mat base)
             tMin = 70;
 		}
 
-		//bounding box
-		Rect bound = boundingRect(contour);
-		#ifdef HEAD
-		rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
-		#endif
-		
-		//int width = bound.width;
+		if(isContourConvex(contour)){
+			
+			convexHull(contour, hull, true);
 
-		//finds target center and places crosshair
-		Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
-		#ifdef HEAD
-		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		#endif
+			#ifdef HEAD
+			drawContours(base, hull, -1, Scalar(255, 0, 0), 1);
+			#endif
+			//bounding box
+			Rect bound = boundingRect(contour);
+			#ifdef HEAD
+			rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
+			#endif
 
-		//Draw crosshair on the center of the image
-		int imgWidth = base.cols;
-		int imgHeight = base.rows;
-		#ifdef HEAD
-		drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		#endif
+			//finds target center and places crosshair
+			Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
+			#ifdef HEAD
+			drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
+			#endif
 
-		//find and send values
-		double tY = calculateTY(imgHeight, centerOfTarget, FovY);
-		double Xrot = emersonXrot(imgWidth, centerOfTarget, FovX);
-		double distToTarget = cameraHexDif/sin(tY+tYOffset);
+			//Draw crosshair on the center of the image
+			int imgWidth = base.cols;
+			int imgHeight = base.rows;
+			#ifdef HEAD
+			drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
+			#endif
 
-		cout << to_string(tMin) << endl;
-		if(distToTarget < 500){
-			cout << "Distance to target center: " + to_string(distToTarget) << endl;
-			sendMessage("Distance", distToTarget);
+			//find and send values
+			double tY = calculateTY(imgHeight, centerOfTarget, FovY);
+			double Xrot = emersonXrot(imgWidth, centerOfTarget, FovX);
+			double distToTarget = cameraHexDif/sin(tY+tYOffset);
+
+			cout << "Thresh value: " << to_string(tMin) << endl;
+			if(distToTarget < 500){
+				cout << "Distance to target center: " + to_string(distToTarget) << endl;
+				#ifdef LINUX
+				sendMessage("Distance", distToTarget);
+				#endif
+			}
+			cout << "tY: " << to_string(tY) << endl;
+			#ifdef LINUX
+			sendMessage("tY", tY);
+			#endif
+			cout << "XRot: " << to_string(Xrot) << endl;
+			#ifdef LINUX
+			sendMessage("Xrot", Xrot);
+			#endif
+			cout << " " << endl;
 		}
-		cout << "tY: " << to_string(tY) << endl;
-		cout << "XRot: " << to_string(Xrot) << endl;
-		sendMessage("Xrot", Xrot);
-		cout << " " << endl;
 	}
 	//show final images
 	#ifdef HEAD

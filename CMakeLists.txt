@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 project( vision2020 )
 
-option(HEAD "Run the program without the GUI" OFF)
+option(HEAD "Run the program without the GUI" ON)
+
+option(LINUX "Turns off certain options that don't work on LINUX as of right now" OFF)
+
 #currently does not work
 option(CUDA_VERSION "Run using cuda acceleration" OFF)
 
@@ -14,12 +17,16 @@ find_package( Threads REQUIRED )
 find_package( wpilib REQUIRED )
 
 if(CUDA_VERSION)
-    add_definitions(-DWITH_CUDA)
+    add_definitions(-WITH_CUDA)
 endif(CUDA_VERSION)
 
 if(HEAD)
-	add_definitions(-DHEAD)
+	add_definitions(-HEAD)
 endif(HEAD)
+
+if(LINUX)
+    add_definitions(-LINUX)
+endif(LINUX)
 
 file(GLOB srcs ./*.cpp ./*.h*)
 

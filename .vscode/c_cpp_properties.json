@@ -7,8 +7,7 @@
                 "C:/opencv/build/include",
                 "C:/opencv/build/x64/vc15/lib",
                 "C:/opencv/build/x64/vc15/bin",
-                "C:/opencv/build/x64/vc15/lib/opencv_world412d.lib"
-
+                "C:/opencv/build/x64/vc15/lib/opencv_world420d.lib"
             ],
             "defines": [
                 "_DEBUG",
@@ -18,9 +17,10 @@
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/Hostx64/x64/cl.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++11",
             "intelliSenseMode": "msvc-x64",
-            "compileCommands": "C:/USERS/VISION STATION/DESKTOP/VSVISIONTHING/CMAKE OPENCV/BUILD/COMPILE_COMMANDS.JSON"
+            "compileCommands": "C:/USERS/VISION STATION/DESKTOP/VSVISIONTHING/Vision2020/BUILD/COMPILE_COMMANDS.JSON",
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4
