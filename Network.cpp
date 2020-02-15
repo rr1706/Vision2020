@@ -1,4 +1,3 @@
-#ifdef LINUX
 #include "ntcore.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
@@ -24,4 +23,3 @@ void sendMessage(string entryName, double input){
 void sendString(string entryName, string input){
 	myTable->PutString(entryName, input);
 }
-#endif

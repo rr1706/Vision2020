@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.0)
 project( vision2020 )
 
 option(HEAD "Run the program without the GUI" ON)
-
-option(LINUX "Turns off certain options that don't work on LINUX as of right now" OFF)
-
 #currently does not work
 option(CUDA_VERSION "Run using cuda acceleration" OFF)
 
@@ -23,10 +20,6 @@ endif(CUDA_VERSION)
 if(HEAD)
 	add_definitions(-HEAD)
 endif(HEAD)
-
-if(LINUX)
-    add_definitions(-LINUX)
-endif(LINUX)
 
 file(GLOB srcs ./*.cpp ./*.h*)
 

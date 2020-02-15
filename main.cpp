@@ -5,10 +5,8 @@
 #include "Functions.hpp"
 #include <opencv2/core/utils/filesystem.hpp>
 #include <fstream>
-#ifdef LINUX
 #include "Network.hpp"
 #include <unistd.h>
-#endif
 
 using namespace cv;
 using namespace std;
@@ -43,17 +41,15 @@ void runCamera(Mat base);
 //press esc key to close program
 char esc;
 
-#ifdef LINUX
 std::map<std::string, std::string> settings = {
     {"mode", "run"},
     {"frontCam", "/dev/video0"}
 };
-#endif
 
 
 int main(int argc, char** argv)
 {
-	#ifdef LINUX
+	
 	while(!utils::fs::exists("/dev/video0")){
 		usleep(500);
 	}
@@ -62,12 +58,9 @@ int main(int argc, char** argv)
 	system(("v4l2ctrl -d " + settings["frontCam"] + " -l CamSettings.conf").c_str());
 
 	startTable();
-	#endif
 
 	camera.open(0);
-	#ifdef LINUX
 	sendString("On?", "Yes");
-	#endif
 
 	//display with with camera
 	Mat base;
@@ -83,9 +76,7 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
-	#ifdef LINUX
 	sendString("On?", "No");
-	#endif
 	camera.release();
 	return 0;
 }
@@ -163,18 +154,12 @@ void runCamera(Mat base)
 			cout << "Thresh value: " << to_string(tMin) << endl;
 			if(distToTarget < 500){
 				cout << "Distance to target center: " + to_string(distToTarget) << endl;
-				#ifdef LINUX
 				sendMessage("Distance", distToTarget);
-				#endif
 			}
 			cout << "tY: " << to_string(tY) << endl;
-			#ifdef LINUX
 			sendMessage("tY", tY);
-			#endif
 			cout << "XRot: " << to_string(Xrot) << endl;
-			#ifdef LINUX
 			sendMessage("Xrot", Xrot);
-			#endif
 			cout << " " << endl;
 		}
 	}
