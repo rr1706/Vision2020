@@ -14,11 +14,11 @@ find_package( Threads REQUIRED )
 find_package( wpilib REQUIRED )
 
 if(CUDA_VERSION)
-    add_definitions(-WITH_CUDA)
+    add_definitions(-DWITH_CUDA)
 endif(CUDA_VERSION)
 
 if(HEAD)
-	add_definitions(-HEAD)
+	add_definitions(-DHEAD)
 endif(HEAD)
 
 file(GLOB srcs ./*.cpp ./*.h*)

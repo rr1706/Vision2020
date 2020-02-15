@@ -49,16 +49,14 @@ std::map<std::string, std::string> settings = {
 
 int main(int argc, char** argv)
 {
-	
 	while(!utils::fs::exists("/dev/video0")){
 		usleep(500);
 	}
 
 	loadConfig("VisionSettings.conf");
-	system(("v4l2ctrl -d " + settings["frontCam"] + " -l CamSettings.conf").c_str());
+	system("setCam.sh");
 
 	startTable();
-
 	camera.open(0);
 	sendString("On?", "Yes");
 
@@ -68,8 +66,7 @@ int main(int argc, char** argv)
 	{
 		camera >> base;
 		flip(base, base, 0); //only needed if cam is upside down
-        runCamera(base);
-
+        	runCamera(base);
 		esc = waitKey(33);
 		if (esc == 27)
 		{
@@ -82,63 +79,53 @@ int main(int argc, char** argv)
 }
 
 void runCamera(Mat base)
-{	
+{
 	//used for a threshed image
-	Mat threshed, splitChannels[3];
+	Mat threshed;
 
 	//used in contours
 	vector<vector<Point2i>> contours;
 	vector<Vec4i> hierarchy;
-	vector<Point2i> hull;
 
-	//split color channels
-	split(base, splitChannels);
+	//note: optimize
+	threshold(base, threshed, tMin, 255, THRESH_BINARY); //try adaptive threshold
 
-	//note: optimize threshing and pick one
-	threshold(splitChannels[0], threshed, tMin, 255, THRESH_BINARY); //try adaptive threshold
-	//inRange(base, lowerVals, upperVals, threshed);
-	dilate(threshed, threshed, kernel);
-	erode(threshed, threshed, kernel);
-
-    //contours
+    	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef HEAD
 	drawContours(base, contours, -1, Scalar(0, 255, 0), 1);
 	#endif
-	
 	if(contours.size()<1){
 		tMin=70;
 	}
-	
+	vector<vector<Point2i>> hull(contours.size());
 	//only complete if a countour is found
-	for (vector<Point2i> contour : contours){
+	for(size_t i = 0; i <  contours.size(); i++){
+
+		vector<Point2i> contour = contours[i];
 
 		if(contourArea(contour) > 300){
-            tMin = 200;
-        }
+            		tMin = 200;
+        	}
 		if(contourArea(contour) < 70 || contours.size() < 1){
-            tMin = 70;
+            		tMin = 70;
 		}
-
 		if(isContourConvex(contour)){
-			
-			convexHull(contour, hull, true);
 
+			convexHull(contours[i], hull[i]);
 			#ifdef HEAD
-			drawContours(base, hull, -1, Scalar(255, 0, 0), 1);
+			drawContours(base, hull, (int)i, Scalar(0,0,255));
 			#endif
 			//bounding box
 			Rect bound = boundingRect(contour);
 			#ifdef HEAD
 			rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
 			#endif
-
 			//finds target center and places crosshair
 			Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
 			#ifdef HEAD
 			drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 			#endif
-
 			//Draw crosshair on the center of the image
 			int imgWidth = base.cols;
 			int imgHeight = base.rows;
@@ -167,6 +154,5 @@ void runCamera(Mat base)
 	#ifdef HEAD
 	imshow("Normal", base);
 	imshow("Thresh", threshed);
-	imshow("B", splitChannels[0]);
 	#endif
 }
