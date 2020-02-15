@@ -53,8 +53,8 @@ int main(int argc, char** argv)
 		usleep(500);
 	}
 
-	loadConfig("VisionSettings.conf");
-	system("setCam.sh");
+	loadConfig("../VisionSettings.conf");
+	system("/usr/local/bin/setCam.sh");
 
 	startTable();
 	camera.open(0);
@@ -81,14 +81,15 @@ int main(int argc, char** argv)
 void runCamera(Mat base)
 {
 	//used for a threshed image
-	Mat threshed;
+	Mat threshed, splitChannels[3], merged;
 
 	//used in contours
 	vector<vector<Point2i>> contours;
 	vector<Vec4i> hierarchy;
 
-	//note: optimize
-	threshold(base, threshed, tMin, 255, THRESH_BINARY); //try adaptive threshold
+	inRange(base,Scalar(25,25,25),Scalar(255,255,255),threshed);
+	//dilate(threshed, threshed, kernel);
+	//erode(threshed, threshed, kernel);
 
     	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
@@ -102,7 +103,7 @@ void runCamera(Mat base)
 	//only complete if a countour is found
 	for(size_t i = 0; i <  contours.size(); i++){
 
-		vector<Point2i> contour = contours[i];
+		vector<Point2i> contour = contours[0];
 
 		if(contourArea(contour) > 300){
             		tMin = 200;
@@ -110,11 +111,11 @@ void runCamera(Mat base)
 		if(contourArea(contour) < 70 || contours.size() < 1){
             		tMin = 70;
 		}
-		if(isContourConvex(contour)){
+		if(contourArea(contour) < 100){
 
 			convexHull(contours[i], hull[i]);
 			#ifdef HEAD
-			drawContours(base, hull, (int)i, Scalar(0,0,255));
+			drawContours(base, hull, (int)i, Scalar(255,0,255));
 			#endif
 			//bounding box
 			Rect bound = boundingRect(contour);
