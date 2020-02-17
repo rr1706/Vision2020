@@ -18,7 +18,7 @@ VideoCapture camera;
 
 //constents: need to be changed when camera moves/replaced
 double tYOffset = 30;
-double camHeight =  22.25;
+double camHeight =  22.25; //height off ground
 double focalLength = 319.97856484; //find new fl
 double px_per_mm = 0; //find
 //double focalLength = 309.15445743;
@@ -35,7 +35,7 @@ double FovY = 72.05474677;
 
 
 //basic thresh value
-int tMin = 100;
+int tMin = 170;
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
 Mat kernel = (cv::Mat_<unsigned char>(3,3) << 1,0,1,0,1,0,1,0,1); //look for new kernal
@@ -71,8 +71,8 @@ int main(int argc, char** argv)
 	while(camera.isOpened())
 	{
 		camera >> base;
-		flip(base, base, 0); //only needed if cam is upside down
-        runCamera(base);
+		//flip(base, base, 0); //only needed if cam is upside down
+		runCamera(base);
 		esc = waitKey(33);
 		if (esc == 27)
 		{
@@ -96,7 +96,8 @@ void runCamera(Mat base)
 	vector<Vec4i> hierarchy;
 
 	//try canny
-	inRange(base,Scalar(tMin,tMin,tMin),Scalar(256,256,256),threshed);
+	//inRange(base,Scalar(1,1,1),Scalar(255,255,255),threshed);
+	threshold(base,threshed,tMin,255,THRESH_BINARY);
 	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	//Canny(base, threshed, 50, 100);
@@ -123,61 +124,72 @@ void runCamera(Mat base)
 		if(contourArea(contour) < 70 || contours.size() < 1){
             tMin--;
 		}
-		if(contourArea(contours[i])){
+		if(contourArea(contours[i]) < 1000){
 
 			convexHull(contours[i], hull[i]);
 			#ifdef HEAD
 			drawContours(base, hull, (int)i, Scalar(255,0,255));
 			#endif
-			//bounding box
-			Rect bound = boundingRect(contours[i]);
-			#ifdef HEAD
-			RotatedRect rotRect = minAreaRect(contours[i]);
-			rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 5);
-			#endif
-			//finds target center and places crosshair
-			Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
-			#ifdef HEAD
-			drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-			#endif
-			//Draw crosshair on the center of the image
-			int imgWidth = base.cols;
-			int imgHeight = base.rows;
-		 	double pxWidth = (double) bound.width;
-			#ifdef HEAD
-			drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-			#endif
 
-			//find and send values
-			double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
-			double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX); // maybe find new tx formula
-			double distToTarget = findDistance2(widthOfHex, pxWidth, focalLength, px_per_mm); //finish
+			//based off https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
+			vector<double> approx;
+			double peri = arcLength(contour, true);
+			approxPolyDP(contour, approx, 0.04 * peri, true);
+			cout << "approx points: " << to_string(approx.size) << endl;
 
-			cout << "Thresh value: " << to_string(tMin) << endl;
-			if(distToTarget < 500){
-				cout << "Distance to target: " + to_string(distToTarget) << endl;
+			if(approx.size == 4){
+				
+				//bounding box
+				Rect bound = boundingRect(contours[i]);
 				#ifdef HEAD
-				putText(base, "Distance: " + to_string(distToTarget), Point(30,30), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
+				RotatedRect rotRect = minAreaRect(contours[i]);
+				rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 5);
+				#endif
+				//finds target center and places crosshair
+				Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
+				#ifdef HEAD
+				drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
+				#endif
+				//Draw crosshair on the center of the image
+				int imgWidth = base.cols;
+				int imgHeight = base.rows;
+				double pxWidth = (double) bound.width;
+				#ifdef HEAD
+				drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
+				#endif
+
+				//find and send values
+				double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
+				double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX); // maybe find new tx formula
+				double distToTarget = findDistance2(widthOfHex, pxWidth, focalLength, px_per_mm); //finish
+
+				cout << "contour area: " << to_string(contourArea(contour)) << endl;
+				cout << "Thresh value: " << to_string(tMin) << endl;
+				if(distToTarget < 500){
+					cout << "Distance to target: " + to_string(distToTarget) << endl;
+					#ifdef HEAD
+					putText(base, "Distance: " + to_string(distToTarget), Point(30,30), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
+					#endif
+					#ifdef NETWORK
+					sendDouble("Distance", distToTarget);
+					#endif
+				}
+				cout << "tY: " << to_string(tY) << endl;
+				#ifdef Head
+				putText(base, "tY: " + to_string(tY), Point(60,60), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
 				#endif
 				#ifdef NETWORK
-				sendDouble("Distance", distToTarget);
+				sendDouble("tY", tY);
 				#endif
+				cout << "Xrot: " << to_string(Xrot) << endl;
+				#ifdef HEAD
+				putText(base, "Xrot: " + to_string(Xrot), Point(90,90), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
+				#endif
+				#ifdef NETWORK
+				sendDouble("Xrot", Xrot);
+				#endif
+				cout << " " << endl;
 			}
-			cout << "tY: " << to_string(tY) << endl;
-			#ifdef Head
-			putText(base, "tY: " + to_string(tY), Point(60,60), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
-			#endif
-			#ifdef NETWORK
-			sendDouble("tY", tY);
-			#endif
-			cout << "Xrot: " << to_string(Xrot) << endl;
-			#ifdef HEAD
-			putText(base, "Xrot: " + to_string(Xrot), Point(90,90), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
-			#endif
-			#ifdef NETWORK
-			sendDouble("Xrot", Xrot);
-			#endif
-			cout << " " << endl;
 		}
 	}
 	//show final images
