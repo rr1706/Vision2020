@@ -32,5 +32,5 @@ file(GLOB srcs ./*.cpp ./*.h*)
 add_executable( vision2020 ${srcs} )
 target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} ntcore )
 
-#install(TARGETS vision2020 RUNTIME DESTINATION bin)
-#install(FILES vision.service DESTINATION /lib/systemd/system)
+install(TARGETS vision2020 RUNTIME DESTINATION bin)
+install(FILES vision.service DESTINATION /lib/systemd/system)
