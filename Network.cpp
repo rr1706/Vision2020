@@ -1,3 +1,4 @@
+#ifdef NETWORK
 #include "ntcore.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
@@ -16,10 +17,20 @@ void startTable(){
 	myTable = NetworkTable::GetTable("SmartDashboard");
 }
 
-void sendMessage(string entryName, double input){
+void sendDouble(string entryName, double input){
 	myTable->PutNumber(entryName, input);
 }
 
 void sendString(string entryName, string input){
 	myTable->PutString(entryName, input);
 }
+
+string pullString(string entryName, string defaultValue){
+	return myTable->GetString(entryName, defaultValue);
+
+}
+
+string pullDouble(string entryName, double defaultValue){
+	return myTable->GetNumber(entryName, defaultValue);
+}
+#endif

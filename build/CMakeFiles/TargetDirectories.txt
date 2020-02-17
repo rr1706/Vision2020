@@ -1,0 +1,3 @@
+/home/william/Vscode/Vision2020/build/CMakeFiles/rebuild_cache.dir
+/home/william/Vscode/Vision2020/build/CMakeFiles/vision2020.dir
+/home/william/Vscode/Vision2020/build/CMakeFiles/edit_cache.dir

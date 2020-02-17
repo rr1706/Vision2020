@@ -13,8 +13,8 @@ double emersonXrot(double imgWidth, cv::Point centeroftarget, double fovCamera);
 
 double calculateTY(double imgHeight, cv::Point centeroftarget, double fovCameraY);
 
-extern std::map<std::string, std::string> settings;
+//extern std::map<std::string, std::string> settings;
 
-void loadConfig(string filename);
+//void loadConfig(string filename);
 
 void runCamera(Mat base);

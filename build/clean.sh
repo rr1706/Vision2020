@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo rm --dir -r CMakeFiles
 sudo rm CMakeCache.txt
 sudo rm Makefile

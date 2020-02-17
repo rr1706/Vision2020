@@ -5,7 +5,9 @@
 #include "Functions.hpp"
 #include <opencv2/core/utils/filesystem.hpp>
 #include <fstream>
+#ifdef NETWORK
 #include "Network.hpp"
+#endif
 #include <unistd.h>
 
 using namespace cv;
@@ -41,10 +43,10 @@ void runCamera(Mat base);
 //press esc key to close program
 char esc;
 
-std::map<std::string, std::string> settings = {
+/*std::map<std::string, std::string> settings = {
     {"mode", "run"},
     {"frontCam", "/dev/video0"}
-};
+};*/
 
 
 int main(int argc, char** argv)
@@ -53,27 +55,31 @@ int main(int argc, char** argv)
 		usleep(500);
 	}
 
-	loadConfig("../VisionSettings.conf");
+	//loadConfig("../VisionSettings.conf");
 	system("/usr/local/bin/setCam.sh");
-
+	#ifdef NETWORK
 	startTable();
+	#endif
 	camera.open(0);
+	#ifdef NETWORK
 	sendString("On?", "Yes");
-
+	#endif
 	//display with with camera
 	Mat base;
 	while(camera.isOpened())
 	{
 		camera >> base;
 		flip(base, base, 0); //only needed if cam is upside down
-        	runCamera(base);
+        runCamera(base);
 		esc = waitKey(33);
 		if (esc == 27)
 		{
 			break;
 		}
 	}
+	#ifdef NETWORK
 	sendString("On?", "No");
+	#endif
 	camera.release();
 	return 0;
 }
@@ -120,7 +126,7 @@ void runCamera(Mat base)
 			//bounding box
 			Rect bound = boundingRect(contour);
 			#ifdef HEAD
-			rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 2);
+			rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 3);
 			#endif
 			//finds target center and places crosshair
 			Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
@@ -142,12 +148,18 @@ void runCamera(Mat base)
 			cout << "Thresh value: " << to_string(tMin) << endl;
 			if(distToTarget < 500){
 				cout << "Distance to target center: " + to_string(distToTarget) << endl;
-				sendMessage("Distance", distToTarget);
+				#ifdef NETWORK
+				sendDouble("Distance", distToTarget);
+				#endif
 			}
 			cout << "tY: " << to_string(tY) << endl;
-			sendMessage("tY", tY);
+			#ifdef NETWORK
+			sendDouble("tY", tY);
+			#endif
 			cout << "XRot: " << to_string(Xrot) << endl;
-			sendMessage("Xrot", Xrot);
+			#ifdef NETWORK
+			sendDouble("Xrot", Xrot);
+			#endif
 			cout << " " << endl;
 		}
 	}

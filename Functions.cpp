@@ -28,7 +28,7 @@ double calculateTY(double imgHeight, cv::Point centeroftarget, double fovCameraY
 }
 
 
-extern std::map<std::string, std::string> settings;
+/*extern std::map<std::string, std::string> settings;
 
 void loadConfig(string filename){
     string line;
@@ -49,3 +49,4 @@ void loadConfig(string filename){
     }
     else printf("unable to open file\n");
 }
+*/

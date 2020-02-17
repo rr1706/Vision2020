@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/william/Vscode/Vision2020/build",
+  "command": "/bin/g++-9  -DWITH_HEAD -isystem /usr/local/include/opencv4 -isystem /usr/local/wpilib/include/ntcore -isystem /usr/local/wpilib/include/wpiutil  -g   -std=c++17 -o CMakeFiles/vision2020.dir/Functions.cpp.o -c /home/william/Vscode/Vision2020/Functions.cpp",
+  "file": "/home/william/Vscode/Vision2020/Functions.cpp"
+},
+{
+  "directory": "/home/william/Vscode/Vision2020/build",
+  "command": "/bin/g++-9  -DWITH_HEAD -isystem /usr/local/include/opencv4 -isystem /usr/local/wpilib/include/ntcore -isystem /usr/local/wpilib/include/wpiutil  -g   -std=c++17 -o CMakeFiles/vision2020.dir/Network.cpp.o -c /home/william/Vscode/Vision2020/Network.cpp",
+  "file": "/home/william/Vscode/Vision2020/Network.cpp"
+},
+{
+  "directory": "/home/william/Vscode/Vision2020/build",
+  "command": "/bin/g++-9  -DWITH_HEAD -isystem /usr/local/include/opencv4 -isystem /usr/local/wpilib/include/ntcore -isystem /usr/local/wpilib/include/wpiutil  -g   -std=c++17 -o CMakeFiles/vision2020.dir/main.cpp.o -c /home/william/Vscode/Vision2020/main.cpp",
+  "file": "/home/william/Vscode/Vision2020/main.cpp"
+}
+]
