@@ -5,7 +5,7 @@ option(HEAD "Run the program without the GUI" ON)
 #currently does not work
 option(CUDA_VERSION "Run using cuda acceleration" OFF)
 
-option(NETWORK "Control networking on or off" OFF)
+option(NETWORK "Control networking on or off" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

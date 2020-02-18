@@ -1,6 +1,8 @@
 #!/bin/bash
 #turn head on when testing and network on when actually using
+sudo systemctl stop vision
 sudo pkill vision
-cmake .. -DWITH_HEAD=ON -DWITH_NETWORK=ON
+cmake .. -DHEAD=ON
 make -j4
-sudo make install -j4
+sudo make install
+sudo cp ../setCam.sh /usr/local/bin/setCam.sh

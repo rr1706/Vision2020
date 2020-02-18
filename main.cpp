@@ -19,8 +19,8 @@ VideoCapture camera;
 //constents: need to be changed when camera moves/replaced
 double tYOffset = 30;
 double camHeight =  22.25; //height off ground
-double focalLength = 319.97856484; //find new fl
-double px_per_mm = 0; //find
+double focalLength = 457.5; //find new fl
+double px_per_mm = 1.52048426; //find
 //double focalLength = 309.15445743;
 //double robotCenter = 10.795;
 
@@ -96,15 +96,15 @@ void runCamera(Mat base)
 	vector<Vec4i> hierarchy;
 
 	//try canny
-	//inRange(base,Scalar(1,1,1),Scalar(255,255,255),threshed);
-	threshold(base,threshed,tMin,255,THRESH_BINARY);
+	inRange(base,Scalar(tMin,tMin,tMin),Scalar(255,255,255),threshed);
+	//threshold(base,threshed,tMin,255,THRESH_BINARY);
 	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	//Canny(base, threshed, 50, 100);
 
     //contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-	#ifdef HEAD
+	#ifdef WITH_HEAD
 	drawContours(base, contours, -1, Scalar(0, 255, 0), 1);
 	#endif
 
@@ -127,39 +127,39 @@ void runCamera(Mat base)
 		if(contourArea(contours[i]) < 1000){
 
 			convexHull(contours[i], hull[i]);
-			#ifdef HEAD
+			#ifdef WITH_HEAD
 			drawContours(base, hull, (int)i, Scalar(255,0,255));
 			#endif
 
 			//based off https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
-			vector<double> approx;
-			double peri = arcLength(contour, true);
-			approxPolyDP(contour, approx, 0.04 * peri, true);
-			cout << "approx points: " << to_string(approx.size) << endl;
+			//vector<double> approx;
+			//double peri = arcLength(contour, true);
+			//approxPolyDP(contour, approx, 0.04 * peri, true);
+			//cout << "approx points: " << to_string(approx.size()) << endl;
 
-			if(approx.size == 4){
+			//if(approx.size == 4){
 				
 				//bounding box
 				Rect bound = boundingRect(contours[i]);
-				#ifdef HEAD
+				#ifdef WITH_HEAD
 				RotatedRect rotRect = minAreaRect(contours[i]);
 				rectangle(base, bound.tl(), bound.br(), Scalar(255, 0, 0), 5);
 				#endif
 				//finds target center and places crosshair
 				Point2f centerOfTarget = Point(bound.x+bound.width/2, bound.y+bound.height/2);
-				#ifdef HEAD
+				#ifdef WITH_HEAD
 				drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 				#endif
 				//Draw crosshair on the center of the image
 				int imgWidth = base.cols;
 				int imgHeight = base.rows;
 				double pxWidth = (double) bound.width;
-				#ifdef HEAD
+				#ifdef WITH_HEAD
 				drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 				#endif
 
 				//find and send values
-				double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
+				//double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
 				double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX); // maybe find new tx formula
 				double distToTarget = findDistance2(widthOfHex, pxWidth, focalLength, px_per_mm); //finish
 
@@ -167,36 +167,33 @@ void runCamera(Mat base)
 				cout << "Thresh value: " << to_string(tMin) << endl;
 				if(distToTarget < 500){
 					cout << "Distance to target: " + to_string(distToTarget) << endl;
-					#ifdef HEAD
+					#ifdef WITH_HEAD
 					putText(base, "Distance: " + to_string(distToTarget), Point(30,30), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
 					#endif
 					#ifdef NETWORK
 					sendDouble("Distance", distToTarget);
 					#endif
 				}
-				cout << "tY: " << to_string(tY) << endl;
+				/*cout << "tY: " << to_string(tY) << endl;
 				#ifdef Head
 				putText(base, "tY: " + to_string(tY), Point(60,60), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
 				#endif
 				#ifdef NETWORK
 				sendDouble("tY", tY);
-				#endif
+				#endif*/
 				cout << "Xrot: " << to_string(Xrot) << endl;
-				#ifdef HEAD
+				#ifdef WITH_HEAD
 				putText(base, "Xrot: " + to_string(Xrot), Point(90,90), FONT_HERSHEY_COMPLEX, 5, Scalar(255,50,200));
 				#endif
 				#ifdef NETWORK
 				sendDouble("Xrot", Xrot);
 				#endif
 				cout << " " << endl;
-			}
+			//}
 		}
 	}
 	//show final images
-	#ifdef HEAD
-	//may have the synax backwards
-	namedWindow("Normal", WINDOW_FREERATIO);
-	namedWindow("Thresh", WINDOW_FREERATIO);
+	#ifdef WITH_HEAD
 	imshow("Normal", base);
 	imshow("Thresh", threshed);
 	#endif
