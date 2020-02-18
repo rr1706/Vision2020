@@ -5,10 +5,10 @@
 /usr/bin/v4l2-ctl -c saturation=0
 /usr/bin/v4l2-ctl -c hue=2000
 /usr/bin/v4l2-ctl -c white_balance_temperature_auto=0
-/usr/bin/v4l2-ctl -c white_balance_temperature=2800
+/usr/bin/v4l2-ctl -c white_balance_temperature=4000
 /usr/bin/v4l2-ctl -c gamma=100
 /usr/bin/v4l2-ctl -c power_line_frequency=1
 /usr/bin/v4l2-ctl -c sharpness=5
 /usr/bin/v4l2-ctl -c backlight_compensation=1
 /usr/bin/v4l2-ctl -c exposure_auto=1
-/usr/bin/v4l2-ctl -c exposure_absolute=2413
+/usr/bin/v4l2-ctl -c exposure_absolute=5000
