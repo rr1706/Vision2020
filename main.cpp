@@ -17,15 +17,12 @@ using namespace std;
 VideoCapture camera;
 
 //constents: need to be changed when camera moves/replaced
-double tYOffset = 30;
 double camHeight = 22.25;		//height off ground
-double focalLength = 1559.29;		//find new fl
-double px_per_mm = 1.52048426;	//find
-//double focalLength = 309.15445743;
-//double robotCenter = 10.795;
+double focalLength = 1559.29;
+//double px_per_mm = 1.52048426;	//find
 
 //Won't need changed
-double widthOfHex = 39.25 * 25.4;
+double widthOfHex = 39.25;
 double targetHeight = 91;
 double cameraHexDif = targetHeight - camHeight;
 
@@ -35,7 +32,7 @@ double FovY = 72.05474677;
 
 
 //basic thresh value
-int tMin = 20;
+int tMin = 30;
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
 Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1, 0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
@@ -52,15 +49,14 @@ int main(int argc, char **argv)
 		usleep(500);
 	}
 
-	//loadConfig("../VisionSettings.conf");
 	system("/usr/local/bin/setCam.sh");
-#ifdef NETWORK
+	#ifdef NETWORK
 	startTable();
-#endif
+	#endif
 	camera.open(0);
-#ifdef NETWORK
+	#ifdef NETWORK
 	sendString("On?", "Yes");
-#endif
+	#endif
 	//display with with camera
 	Mat base;
 	while (camera.isOpened()) {
@@ -72,16 +68,16 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-#ifdef NETWORK
+	#ifdef NETWORK
 	sendString("On?", "No");
-#endif
+	#endif
 	camera.release();
 	return 0;
 }
 
 void runCamera(Mat base)
 {
-	std::cout << "Frame rate " << base.cols << std::endl;
+
 	//used for a threshed image
 	Mat threshed;
 
@@ -90,20 +86,18 @@ void runCamera(Mat base)
 	vector <Vec4i> hierarchy;
 
 	cv::cvtColor(base, threshed, COLOR_BGR2GRAY);
-	//cv::threshold(threshed, threshed,tMin,255,THRESH_BINARY);
-	cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
+	cv::threshold(threshed, threshed,tMin,255,THRESH_BINARY);
+	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel);
 	erode(threshed, threshed, kernel);
-	cv::imshow("Erode", threshed);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 
 	//contours
-	findContours(threshed, contours, hierarchy, RETR_EXTERNAL,
-				 CHAIN_APPROX_SIMPLE);
-#ifdef WITH_HEAD
-	drawContours(base, contours, -1, Scalar(0, 255, 0), 1);
-#endif
+	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+	#ifdef WITH_HEAD
+	drawContours(base, contours, -1, Scalar(255, 10, 100), 1);
+	#endif
 
 	vector<Point2i> contour;
 
@@ -118,10 +112,12 @@ void runCamera(Mat base)
 		convexHull(c, h);
 		approxPolyDP(h, p, 12, true);
 		std::cout << "POLYGON SIZE " << p.size() << std::endl;
-#ifdef WITH_HEAD
+
+		#ifdef WITH_HEAD
 		std::vector<std::vector<Point2i>> draw{p};
-		drawContours(base, draw, -1, Scalar(64, 128, 255));
-#endif
+		drawContours(base, draw, -1, Scalar(255, 150, 50));
+		#endif
+
 		if (p.size() == 4)
 		{
 			contour = c;
@@ -134,59 +130,47 @@ void runCamera(Mat base)
 	{
 		auto bound = boundingRect(contour);
 		RotatedRect rotRect = minAreaRect(contour);
-		double height = rotRect.size.height;
+		double boundHeight = rotRect.size.height;
 		//finds target center and places crosshair
-		Point2f centerOfTarget = Point(bound.x + bound.width / 2,
-									   bound.y + bound.height / 2);
-#ifdef WITH_HEAD
-		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0),
-				   MARKER_CROSS, 20, 5);
-#endif
+		Point2f centerOfTarget = Point(bound.x + bound.width / 2, bound.y + bound.height / 2);
+		#ifdef WITH_HEAD
+		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
+		#endif
 		//Draw crosshair on the center of the image
 		int imgWidth = base.cols;
 		int imgHeight = base.rows;
 		double pxWidth = (double) bound.width;
-#ifdef WITH_HEAD
+		#ifdef WITH_HEAD
 		drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		putText(base, "THeight: " + to_string(height), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
-#endif
+		#endif
 
 		//find and send values
 		//double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
 		double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX);	// maybe find new tx formula
-		//double distToTarget = findDistance2(widthOfHex, pxWidth, focalLength, px_per_mm);	//finish
-		double distToTarget = findDistance3(17, focalLength, height);	//finish
+		double distToTarget = findDistance(17 /*hex height*/, focalLength, boundHeight);	//finish
 
-		cout << "contour area: " << to_string(contourArea(contour)) <<
-			endl;
+		cout << "contour area: " << to_string(contourArea(contour)) << endl;
 		cout << "Thresh value: " << to_string(tMin) << endl;
-
 		cout << "Distance to target (in): " + to_string(distToTarget) << endl;
-#ifdef WITH_HEAD
-		putText(base, "Distance: " + to_string(distToTarget),
-				Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,
-															   50,
-															   200));
-#endif
-#ifdef NETWORK
-		sendDouble("Distance", distToTarget);
-#endif
-
 		cout << "Xrot: " << to_string(Xrot) << endl;
-#ifdef WITH_HEAD
-		putText(base, "Xrot: " + to_string(Xrot), Point(20, 90),
-				FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
-#endif
-#ifdef NETWORK
+
+		#ifdef WITH_HEAD
+		putText(base, "Distance: " + to_string(distToTarget),Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,50,200));
+		putText(base, "Xrot: " + to_string(Xrot), Point(20, 90), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
+		putText(base, "Bound Height: " + to_string(boundHeight), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
+		#endif
+
+		#ifdef NETWORK
 		sendDouble("Xrot", Xrot);
-#endif
+		sendDouble("Distance", distToTarget);
+		#endif
 		cout << " " << endl;
 
 	}
 
 	//show final images
-#ifdef WITH_HEAD
+	#ifdef WITH_HEAD
 	imshow("Normal", base);
 	//imshow("Thresh", threshed);
-#endif
+	#endif
 }
