@@ -1,12 +1,12 @@
-#ifdef NETWORK
+#ifdef WITH_NETWORK
 #include "ntcore.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
 #include "Network.hpp"
-#include "string"
+//#include "string"
 
 using std::shared_ptr;
-using namespace std;
+//using namespace std;
 
 shared_ptr<NetworkTable> myTable;
 
@@ -23,14 +23,5 @@ void sendDouble(string entryName, double input){
 
 void sendString(string entryName, string input){
 	myTable->PutString(entryName, input);
-}
-
-string pullString(string entryName, string defaultValue){
-	return myTable->GetString(entryName, defaultValue);
-
-}
-
-string pullDouble(string entryName, double defaultValue){
-	return myTable->GetNumber(entryName, defaultValue);
 }
 #endif

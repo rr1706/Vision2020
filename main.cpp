@@ -1,12 +1,13 @@
-//remember to un-comment the install and other stuff, also random errors might mean check the other commented stuff, also update readme
-#include "opencv2/opencv.hpp"
-#include <utility>
+//tried to optimize blind, may work
+#include "opencv2/imgproc.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+//#include "opencv2/opencv.hpp"
 #include <vector>
-#include <cmath>
 #include "Functions.hpp"
 #include <opencv2/core/utils/filesystem.hpp>
-#include <fstream>
-#ifdef NETWORK
+//#include <fstream>
+#ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
 #include <unistd.h>
@@ -17,19 +18,12 @@ using namespace std;
 VideoCapture camera;
 
 //constents: need to be changed when camera moves/replaced
-double camHeight = 22.25;		//height off ground
 double focalLength = 1559.29;
-//double px_per_mm = 1.52048426;	//find
-
 //Won't need changed
 double widthOfHex = 39.25;
-double targetHeight = 91;
-double cameraHexDif = targetHeight - camHeight;
-
 //may need changed
 double FovX = 120;
-double FovY = 72.05474677;
-
+//find y fov maybe
 
 //basic thresh value
 int tMin = 30;
@@ -50,17 +44,18 @@ int main(int argc, char **argv)
 	}
 
 	system("/usr/local/bin/setCam.sh");
-	#ifdef NETWORK
+	#ifdef WITH_NETWORK
 	startTable();
 	#endif
 	camera.open(0);
-	#ifdef NETWORK
+	#ifdef WITH_NETWORK
 	sendString("On?", "Yes");
 	#endif
 	//display with with camera
 	Mat base;
 	while (camera.isOpened()) {
 		camera >> base;
+		//resize(base,base,Size(),xFactor,yFactor,INTER_LANCZOS4); //find values to resize to
 		//flip(base, base, 0); //only needed if cam is upside down
 		runCamera(base);
 		esc = waitKey(33);
@@ -68,7 +63,7 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	#ifdef NETWORK
+	#ifdef WITH_NETWORK
 	sendString("On?", "No");
 	#endif
 	camera.release();
@@ -85,10 +80,10 @@ void runCamera(Mat base)
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cv::cvtColor(base, threshed, COLOR_BGR2GRAY);
-	cv::threshold(threshed, threshed,tMin,255,THRESH_BINARY);
+	cvtColor(base, base, COLOR_BGR2GRAY);
+	threshold(base, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
-	erode(threshed, threshed, kernel);
+	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
@@ -108,13 +103,13 @@ void runCamera(Mat base)
 		if (contourArea(c) < 100 || contourArea(c) > 10000) {
 			continue;
 		}
-		vector<Point2i> h, p;
+		vector<Point2i> h, p; //make a hull variable and a polygon variable, thinking about re-naming
 		convexHull(c, h);
 		approxPolyDP(h, p, 12, true);
-		std::cout << "POLYGON SIZE " << p.size() << std::endl;
+		cout << "POLYGON SIZE " << p.size() << endl;
 
 		#ifdef WITH_HEAD
-		std::vector<std::vector<Point2i>> draw{p};
+		vector<vector<Point2i>> draw{p}; //wraps polygon to be draw in draw contours
 		drawContours(base, draw, -1, Scalar(255, 150, 50));
 		#endif
 
@@ -124,30 +119,25 @@ void runCamera(Mat base)
 		}
 	}
 
-	vector<Point2i> hull, polygon;
-
 	if (!contour.empty())
 	{
-		auto bound = boundingRect(contour);
+		Rect bound = boundingRect(contour);
 		RotatedRect rotRect = minAreaRect(contour);
 		double boundHeight = rotRect.size.height;
+		
 		//finds target center and places crosshair
 		Point2f centerOfTarget = Point(bound.x + bound.width / 2, bound.y + bound.height / 2);
+		
 		#ifdef WITH_HEAD
 		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 		#endif
 		//Draw crosshair on the center of the image
 		int imgWidth = base.cols;
-		int imgHeight = base.rows;
-		double pxWidth = (double) bound.width;
-		#ifdef WITH_HEAD
-		drawMarker(base, Point(imgWidth / 2, imgHeight / 2), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
-		#endif
 
 		//find and send values
 		//double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
 		double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX);	// maybe find new tx formula
-		double distToTarget = findDistance(17 /*hex height*/, focalLength, boundHeight);	//finish
+		double distToTarget = findDistance(17 /*hex height*/, focalLength, boundHeight);
 
 		cout << "contour area: " << to_string(contourArea(contour)) << endl;
 		cout << "Thresh value: " << to_string(tMin) << endl;
@@ -160,10 +150,11 @@ void runCamera(Mat base)
 		putText(base, "Bound Height: " + to_string(boundHeight), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
 		#endif
 
-		#ifdef NETWORK
+		#ifdef WITH_NETWORK
 		sendDouble("Xrot", Xrot);
 		sendDouble("Distance", distToTarget);
 		#endif
+		
 		cout << " " << endl;
 
 	}

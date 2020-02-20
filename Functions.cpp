@@ -1,11 +1,11 @@
 #include <opencv2/opencv.hpp>
 #include "Functions.hpp"
-#include <vector>
-#include <utility>
-#include <fstream>
+//#include <vector>
+//#include <utility>
+//#include <fstream>
 
-using namespace std;
-using namespace cv;
+//using namespace std;
+//using namespace cv;
 
 //xrot equation from Emerson (in degrees)
 double calculateXrot(double imgWidth, cv::Point centeroftarget, double fovCameraX)
