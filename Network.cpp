@@ -3,10 +3,10 @@
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
 #include "Network.hpp"
-//#include "string"
+#include "string"
 
 using std::shared_ptr;
-//using namespace std;
+using namespace std;
 
 shared_ptr<NetworkTable> myTable;
 

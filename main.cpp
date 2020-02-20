@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	Mat base;
 	while (camera.isOpened()) {
 		camera >> base;
-		//resize(base,base,Size(),xFactor,yFactor,INTER_LANCZOS4); //find values to resize to
+		//resize(base, base, Size(), xFactor, yFactor, INTER_LANCZOS4); //find values to resize to
 		//flip(base, base, 0); //only needed if cam is upside down
 		runCamera(base);
 		esc = waitKey(33);

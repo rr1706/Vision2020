@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 project( vision2020 )
 
 option(HEAD "Run the program without the GUI" ON)
-#currently does not work
 option(CUDA_VERSION "Run using cuda acceleration" OFF)
-
-option(NETWORK "Control networking on or off" ON)
+option(NETWORK "Control networking on or off (uses Network Tables)" ON)
+option(NETWORK_UDP "Control networking on or off (uses UDP)" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +21,10 @@ endif(CUDA_VERSION)
 if(HEAD)
 	add_definitions(-DWITH_HEAD)
 endif(HEAD)
+
+if(NETWORK_UDP)
+    add_definitions(-DWITH_NETWORK_UDP)
+endif(NETWORK_UDP)
 
 if(NETWORK)
     add_definitions(-DWITH_NETWORK)

@@ -1,9 +1,9 @@
 #ifdef WITH_NETWORK
 #include "ntcore.h"
 #include "networktables/NetworkTable.h"
-//#include "string"
+#include "string"
 
-//using namespace std;
+using namespace std;
 using std::shared_ptr;
 
 void sendDouble(string entry, double input);
