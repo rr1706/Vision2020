@@ -1,12 +1,13 @@
 //tried to optimize blind, may work
-#include "opencv2/imgproc.hpp"
+
+/*#include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
-//#include "opencv2/opencv.hpp"
+#include "opencv2/highgui.hpp"*/
+#include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
 #include <opencv2/core/utils/filesystem.hpp>
-//#include <fstream>
+#include <fstream>
 #ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
