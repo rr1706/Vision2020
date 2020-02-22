@@ -3,8 +3,6 @@
 /*#include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"*/
-
-#include "opencv2/core/cuda.hpp"
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -17,7 +15,6 @@
 
 using namespace cv;
 using namespace std;
-using namespace cv::cuda;
 
 VideoCapture camera;
 
@@ -33,7 +30,7 @@ double FovX = 120;
 int tMin = 30;
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
-Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1, 0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
+Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
 
 void runCamera(Mat base);
 
@@ -78,16 +75,14 @@ void runCamera(Mat base)
 {
 
 	//used for a threshed image
-	GpuMat threshed, gpuBase;
-
-	base.copyTo(gpuBase);
+	Mat threshed;
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cvtColor(gpuBase, gpuBase, COLOR_BGR2GRAY);
-	threshold(gpuBase, threshed,tMin,255,THRESH_BINARY);
+	cvtColor(base, base, COLOR_BGR2GRAY);
+	threshold(base, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
