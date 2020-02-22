@@ -7,8 +7,7 @@
                 "C:/opencv/build/include",
                 "C:/opencv/build/x64/vc15/lib",
                 "C:/opencv/build/x64/vc15/bin",
-                "C:/opencv/build/x64/vc15/lib/opencv_world420d.lib",
-                "/usr/local/include/opencv4"
+                "C:/opencv/build/x64/vc15/lib/opencv_world420d.lib"
             ],
             "defines": [
                 "_DEBUG",

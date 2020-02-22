@@ -11,6 +11,7 @@ using namespace std;
 shared_ptr<NetworkTable> myTable;
 
 void startTable(){
+	//figure out the deprication thing
 	NetworkTable::SetClientMode();
 	NetworkTable::SetIPAddress("10.17.6.2");
 	NetworkTable::Initialize();
