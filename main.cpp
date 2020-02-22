@@ -3,6 +3,8 @@
 /*#include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"*/
+#include "opencv2/core/cuda.hpp"
+#include "opencv2/core/cuda_types.hpp"
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -15,6 +17,7 @@
 
 using namespace cv;
 using namespace std;
+using namespace cv::cuda;
 
 VideoCapture camera;
 
@@ -75,14 +78,16 @@ void runCamera(Mat base)
 {
 
 	//used for a threshed image
-	Mat threshed;
+	GpuMat threshed, gpuBase;
+
+	base.copyTo(gpuBase);
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cvtColor(base, base, COLOR_BGR2GRAY);
-	threshold(base, threshed,tMin,255,THRESH_BINARY);
+	cvtColor(gpuBase, gpuBase, COLOR_BGR2GRAY);
+	threshold(gpuBase, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
