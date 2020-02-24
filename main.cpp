@@ -1,10 +1,5 @@
 //tried to optimize blind, may work
-
-/*#include "opencv2/imgproc.hpp"
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"*/
-
-#include "opencv2/core/cuda.hpp"
+#include "opencv2/gpuimgproc.hpp"
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -17,7 +12,6 @@
 
 using namespace cv;
 using namespace std;
-using namespace cv::cuda;
 
 VideoCapture camera;
 
@@ -78,16 +72,14 @@ void runCamera(Mat base)
 {
 
 	//used for a threshed image
-	GpuMat threshed, gpuBase;
-
-	base.copyTo(gpuBase);
+	Mat threshed;
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cvtColor(gpuBase, gpuBase, COLOR_BGR2GRAY);
-	threshold(gpuBase, threshed,tMin,255,THRESH_BINARY);
+	cvtColor(base, base, COLOR_BGR2GRAY);
+	threshold(base, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
@@ -130,10 +122,10 @@ void runCamera(Mat base)
 		Rect bound = boundingRect(contour);
 		RotatedRect rotRect = minAreaRect(contour);
 		double boundHeight = rotRect.size.height;
-		
+
 		//finds target center and places crosshair
 		Point2f centerOfTarget = Point(bound.x + bound.width / 2, bound.y + bound.height / 2);
-		
+
 		#ifdef WITH_HEAD
 		drawMarker(base, Point(centerOfTarget), Scalar(255, 0, 0), MARKER_CROSS, 20, 5);
 		#endif
@@ -160,7 +152,7 @@ void runCamera(Mat base)
 		sendDouble("Xrot", Xrot);
 		sendDouble("Distance", distToTarget);
 		#endif
-		
+
 		cout << " " << endl;
 
 	}
