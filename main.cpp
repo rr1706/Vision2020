@@ -1,5 +1,12 @@
 //tried to optimize blind, may work
+<<<<<<< HEAD
 #include "opencv2/gpuimgproc.hpp"
+=======
+
+/*#include "opencv2/imgproc.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"*/
+>>>>>>> afc507a0cad4d110b11f5ff18855e4077ef21f05
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -27,7 +34,7 @@ double FovX = 120;
 int tMin = 30;
 
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
-Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1, 0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
+Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
 
 void runCamera(Mat base);
 
