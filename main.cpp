@@ -1,12 +1,6 @@
-//tried to optimize blind, may work
-<<<<<<< HEAD
-#include "opencv2/gpuimgproc.hpp"
-=======
+#include "opencv2/cudaimgproc.hpp"
+#include "opencv2/core/cuda.hpp"
 
-/*#include "opencv2/imgproc.hpp"
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"*/
->>>>>>> afc507a0cad4d110b11f5ff18855e4077ef21f05
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -19,6 +13,7 @@
 
 using namespace cv;
 using namespace std;
+//using namespace cv::cuda;
 
 VideoCapture camera;
 
@@ -57,12 +52,13 @@ int main(int argc, char **argv)
 	sendString("On?", "Yes");
 	#endif
 	//display with with camera
-	Mat base;
+	Mat base, smol;
 	while (camera.isOpened()) {
 		camera >> base;
-		//resize(base, base, Size(), xFactor, yFactor, INTER_LANCZOS4); //find values to resize to
-		//flip(base, base, 0); //only needed if cam is upside down
-		runCamera(base);
+		cv::Size newSize( base.size().width / 2 , base.size().height / 2 );
+		cv::resize(base, smol, newSize, 0, 0, cv::INTER_AREA);
+		cv::flip(base, base, 0); //only needed if cam is upside down
+		runCamera(smol);
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -79,14 +75,16 @@ void runCamera(Mat base)
 {
 
 	//used for a threshed image
-	Mat threshed;
+	cuda::GpuMat threshed, gbase;
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cvtColor(base, base, COLOR_BGR2GRAY);
-	threshold(base, threshed,tMin,255,THRESH_BINARY);
+	base.copyTo(gbase);
+
+	//cuda::cvtColor(gbase, gbase, COLOR_BGR2GRAY);
+	cuda::threshold(gbase, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
