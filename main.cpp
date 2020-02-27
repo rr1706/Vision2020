@@ -1,6 +1,6 @@
 #include "opencv2/cudaimgproc.hpp"
+#include "opencv2/cudafilters.hpp"
 #include "opencv2/core/cuda.hpp"
-
 #include "opencv2/opencv.hpp"
 #include <vector>
 #include "Functions.hpp"
@@ -9,7 +9,10 @@
 #ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
+
+#ifdef __linux__
 #include <unistd.h>
+#endif
 
 using namespace cv;
 using namespace std;
@@ -39,11 +42,14 @@ char esc;
 
 int main(int argc, char **argv)
 {
+	#ifdef __linux__
 	while (!utils::fs::exists("/dev/video0")) {
 		usleep(500);
 	}
 
 	system("/usr/local/bin/setCam.sh");
+	#endif
+
 	#ifdef WITH_NETWORK
 	startTable();
 	#endif
@@ -52,12 +58,16 @@ int main(int argc, char **argv)
 	sendString("On?", "Yes");
 	#endif
 	//display with with camera
-	Mat base, smol;
+	Mat base;
+	cuda::GpuMat gbase, smol;
 	while (camera.isOpened()) {
 		camera >> base;
-		cv::Size newSize( base.size().width / 2 , base.size().height / 2 );
-		cv::resize(base, smol, newSize, 0, 0, cv::INTER_AREA);
-		cv::flip(base, base, 0); //only needed if cam is upside down
+		
+		base.copyTo(gbase);
+
+		Size newSize( base.size().width / 2 , base.size().height / 2 );
+		cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
+		flip(gbase, base, 0); //only needed if cam is upside down
 		runCamera(smol);
 		esc = waitKey(33);
 		if (esc == 27) {
@@ -71,20 +81,18 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void runCamera(Mat base)
+void runCamera(cuda::GpuMat base)
 {
 
 	//used for a threshed image
-	cuda::GpuMat threshed, gbase;
+	cuda::GpuMat threshed;
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	base.copyTo(gbase);
-
-	//cuda::cvtColor(gbase, gbase, COLOR_BGR2GRAY);
-	cuda::threshold(gbase, threshed,tMin,255,THRESH_BINARY);
+	cuda::cvtColor(base, base, COLOR_BGR2GRAY);
+	cuda::threshold(base, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
