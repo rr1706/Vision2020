@@ -3,16 +3,14 @@
 #include "opencv2/core/cuda.hpp"
 #include "opencv2/opencv.hpp"
 #include <vector>
+#include <iostream>
 #include "Functions.hpp"
 #include <opencv2/core/utils/filesystem.hpp>
 #include <fstream>
 #ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
-
-#ifdef __linux__
 #include <unistd.h>
-#endif
 
 using namespace cv;
 using namespace std;
@@ -42,14 +40,13 @@ char esc;
 
 int main(int argc, char **argv)
 {
-	#ifdef __linux__
+	cout << to_string(0) << endl; //;;
 	while (!utils::fs::exists("/dev/video0")) {
 		usleep(500);
 	}
 
 	system("/usr/local/bin/setCam.sh");
-	#endif
-
+	cout << to_string(1) << endl; //;;
 	#ifdef WITH_NETWORK
 	startTable();
 	#endif
@@ -60,15 +57,18 @@ int main(int argc, char **argv)
 	//display with with camera
 	Mat base;
 	cuda::GpuMat gbase, smol;
+	cout << to_string(2) << endl; //;;
 	while (camera.isOpened()) {
-		camera >> base;
-		
-		base.copyTo(gbase);
 
-		Size newSize( base.size().width / 2 , base.size().height / 2 );
-		cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
-		cuda::flip(gbase, base, 0); //only needed if cam is upside down
-		runCamera(smol);
+		camera >> base;
+		cout << to_string(2.09) << endl; //;;
+		flip(base, base, 0); //only needed if cam is upside down
+		base.copyTo(gbase);
+		cout << to_string(2.1) << endl; //;;
+		//Size newSize( base.size().width / 2 , base.size().height / 2 );
+		//cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
+		cout << to_string(3) << endl; //;;
+		runCamera(gbase);
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -77,7 +77,6 @@ int main(int argc, char **argv)
 	#ifdef WITH_NETWORK
 	sendString("On?", "No");
 	#endif
-	camera.release();
 	return 0;
 }
 
@@ -91,7 +90,10 @@ void runCamera(cuda::GpuMat base)
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
+	cout << to_string(4) << endl; //;;
+
 	cuda::cvtColor(base, base, COLOR_BGR2GRAY);
+	cout << to_string(4.1) << endl; //;;
 	cuda::threshold(base, threshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	erode(threshed, threshed, kernel); //look into reducing this to one line
@@ -99,11 +101,15 @@ void runCamera(cuda::GpuMat base)
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 
+	cout << to_string(5) << endl; //;;
+
 	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef WITH_HEAD
 	drawContours(base, contours, -1, Scalar(255, 10, 100), 1);
 	#endif
+
+	cout << to_string(6) << endl; //;;
 
 	vector<Point2i> contour;
 
