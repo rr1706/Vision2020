@@ -34,7 +34,7 @@ int tMin = 30;
 //sets kernal to a cross, the shape of the kernal is determained by the shape of the target
 Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);	//look for new kernal
 
-void runCamera(Mat base);
+void runCamera(cuda::GpuMat base);
 
 //press esc key to close program
 char esc;
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
 		Size newSize( base.size().width / 2 , base.size().height / 2 );
 		cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
-		flip(gbase, base, 0); //only needed if cam is upside down
+		cuda::flip(gbase, base, 0); //only needed if cam is upside down
 		runCamera(smol);
 		esc = waitKey(33);
 		if (esc == 27) {
