@@ -61,14 +61,16 @@ int main(int argc, char **argv)
 	while (camera.isOpened()) {
 
 		camera >> base;
-		cout << to_string(2.09) << endl; //;;
+		cout << to_string(2.09) << " base.channels = " << base.channels() << endl; //;;
 		flip(base, base, 0); //only needed if cam is upside down
+		cout << to_string(2.09) << "b base.channels = " << base.channels() << endl; //;;
 		base.copyTo(gbase);
-		cout << to_string(2.1) << endl; //;;
+		cout << to_string(2.1) << " base.channels = " << base.channels() << " gbase.channels = " << gbase.channels() << endl; //;;
 		//Size newSize( base.size().width / 2 , base.size().height / 2 );
 		//cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
 		cout << to_string(3) << endl; //;;
-		runCamera(gbase);
+		imshow(gbase, "gpu");
+		//runCamera(gbase);
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -90,7 +92,7 @@ void runCamera(cuda::GpuMat base)
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cout << to_string(4) << endl; //;;
+	cout << to_string(4) << " " << base.channels() << endl; //;;
 
 	cuda::cvtColor(base, base, COLOR_BGR2GRAY);
 	cout << to_string(4.1) << endl; //;;
