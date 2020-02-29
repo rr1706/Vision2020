@@ -40,13 +40,11 @@ char esc;
 
 int main(int argc, char **argv)
 {
-	cout << to_string(0) << endl; //;;
 	while (!utils::fs::exists("/dev/video0")) {
 		usleep(500);
 	}
 
 	system("/usr/local/bin/setCam.sh");
-	cout << to_string(1) << endl; //;;
 	#ifdef WITH_NETWORK
 	startTable();
 	#endif
@@ -57,20 +55,13 @@ int main(int argc, char **argv)
 	//display with with camera
 	Mat base;
 	cuda::GpuMat gbase, smol;
-	cout << to_string(2) << endl; //;;
 	while (camera.isOpened()) {
 
 		camera >> base;
-		cout << to_string(2.09) << " base.channels = " << base.channels() << endl; //;;
 		flip(base, base, 0); //only needed if cam is upside down
-		cout << to_string(2.09) << "b base.channels = " << base.channels() << endl; //;;
-		base.copyTo(gbase);
-		cout << to_string(2.1) << " base.channels = " << base.channels() << " gbase.channels = " << gbase.channels() << endl; //;;
-		//Size newSize( base.size().width / 2 , base.size().height / 2 );
-		//cuda::resize(gbase, smol, newSize, 360, 920, INTER_AREA);
-		cout << to_string(3) << endl; //;;
-		imshow(gbase, "gpu");
-		//runCamera(gbase);
+		gbase = cuda::GpuMat(base);
+		cuda::resize(gbase, smol, Size(960, 720), 0, 0, INTER_AREA);
+		runCamera(smol);
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -82,28 +73,28 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void runCamera(cuda::GpuMat base)
+void runCamera(cuda::GpuMat gbase)
 {
 
 	//used for a threshed image
-	cuda::GpuMat threshed;
+	cuda::GpuMat gthreshed;
+	Mat base, threshed;
 
 	//used in contours
 	vector <vector<Point2i> > contours;
 	vector <Vec4i> hierarchy;
 
-	cout << to_string(4) << " " << base.channels() << endl; //;;
-
-	cuda::cvtColor(base, base, COLOR_BGR2GRAY);
-	cout << to_string(4.1) << endl; //;;
-	cuda::threshold(base, threshed,tMin,255,THRESH_BINARY);
+	cuda::cvtColor(gbase, gbase, COLOR_BGR2GRAY);
+	cuda::threshold(gbase, gthreshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
+	//end cuda :(
+	base = (Mat) gbase;
+	threshed = (Mat) gthreshed;
+
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
-
-	cout << to_string(5) << endl; //;;
 
 	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
@@ -111,7 +102,6 @@ void runCamera(cuda::GpuMat base)
 	drawContours(base, contours, -1, Scalar(255, 10, 100), 1);
 	#endif
 
-	cout << to_string(6) << endl; //;;
 
 	vector<Point2i> contour;
 
