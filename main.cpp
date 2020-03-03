@@ -49,9 +49,6 @@ int main(int argc, char **argv)
 	startTable();
 	#endif
 	camera.open(0);
-	#ifdef WITH_NETWORK
-	sendString("On?", "Yes");
-	#endif
 	//display with with camera
 	Mat base;
 	cuda::GpuMat gbase, smol;
@@ -67,9 +64,6 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-	#ifdef WITH_NETWORK
-	sendString("On?", "No");
-	#endif
 	return 0;
 }
 
@@ -87,8 +81,8 @@ void runCamera(cuda::GpuMat gbase)
 	cuda::cvtColor(gbase, gbase, COLOR_BGR2GRAY);
 	cuda::threshold(gbase, gthreshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
-	//end cuda :(
-	base = (Mat) gbase;
+	//end of cuda :(
+	//base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
 	erode(threshed, threshed, kernel); //look into reducing this to one line
@@ -106,14 +100,14 @@ void runCamera(cuda::GpuMat gbase)
 	vector<Point2i> contour;
 
 	//only complete if a countour is found
-	for (size_t i = 0; i < contours.size(); i++) {
-		vector<Point2i> c = contours[i];
+	for (vector<Point2i> currentContour){
+		//vector<Point2i> c = contours[i];
 		// test contour area
-		if (contourArea(c) < 100 || contourArea(c) > 10000) {
+		if (contourArea(currentContour) < 100 || contourArea(currentContour) > 10000) {
 			continue;
 		}
 		vector<Point2i> h, p; //make a hull variable and a polygon variable, thinking about re-naming
-		convexHull(c, h);
+		convexHull(currentContour, h);
 		approxPolyDP(h, p, 12, true);
 		cout << "POLYGON SIZE " << p.size() << endl;
 
@@ -124,7 +118,7 @@ void runCamera(cuda::GpuMat gbase)
 
 		if (p.size() == 4)
 		{
-			contour = c;
+			contour = currentContour;
 		}
 	}
 
@@ -156,7 +150,7 @@ void runCamera(cuda::GpuMat gbase)
 		#ifdef WITH_HEAD
 		putText(base, "Distance: " + to_string(distToTarget),Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,50,200));
 		putText(base, "Xrot: " + to_string(Xrot), Point(20, 90), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
-		putText(base, "Bound Height: " + to_string(boundHeight), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
+		//putText(base, "Bound Height: " + to_string(boundHeight), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
 		#endif
 
 		#ifdef WITH_NETWORK
@@ -170,7 +164,7 @@ void runCamera(cuda::GpuMat gbase)
 
 	//show final images
 	#ifdef WITH_HEAD
-	imshow("Normal", base);
+	imshow("Normal", gbase);
 	//imshow("Thresh", threshed);
 	#endif
 }
