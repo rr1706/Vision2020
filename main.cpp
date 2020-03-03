@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 		camera >> base;
 		flip(base, base, 0); //only needed if cam is upside down
 		gbase = cuda::GpuMat(base);
-		cuda::resize(gbase, smol, Size(600, 600), 0, 0, INTER_AREA);
-		runCamera(smol);
+		//cuda::resize(gbase, smol, Size(920,400), 0, 0, INTER_AREA);
+		runCamera(gbase);
 		esc = waitKey(33);
 		if (esc == 27) {
 			break;
@@ -82,7 +82,7 @@ void runCamera(cuda::GpuMat gbase)
 	cuda::threshold(gbase, gthreshed,tMin,255,THRESH_BINARY);
 	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
 	//end of cuda :(
-	//base = (Mat) gbase;
+	base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
 	erode(threshed, threshed, kernel); //look into reducing this to one line
@@ -100,7 +100,7 @@ void runCamera(cuda::GpuMat gbase)
 	vector<Point2i> contour;
 
 	//only complete if a countour is found
-	for (vector<Point2i> currentContour){
+	for (vector<Point2i> currentContour : contours){
 		//vector<Point2i> c = contours[i];
 		// test contour area
 		if (contourArea(currentContour) < 100 || contourArea(currentContour) > 10000) {
@@ -164,7 +164,7 @@ void runCamera(cuda::GpuMat gbase)
 
 	//show final images
 	#ifdef WITH_HEAD
-	imshow("Normal", gbase);
+	imshow("Normal", base);
 	//imshow("Thresh", threshed);
 	#endif
 }
