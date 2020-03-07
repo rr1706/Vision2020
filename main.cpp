@@ -1,7 +1,13 @@
 #include "opencv2/cudaimgproc.hpp"
 #include "opencv2/cudafilters.hpp"
 #include "opencv2/core/cuda.hpp"
-#include "opencv2/opencv.hpp"
+//#include "opencv2/opencv.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/core.hpp"
+#ifdef WITH_HEAD
+#include "opencv2/highgui.hpp"
+#endif
+#include <thread>
 #include <vector>
 #include <iostream>
 #include "Functions.hpp"
@@ -11,6 +17,7 @@
 #include "Network.hpp"
 #endif
 #include <unistd.h>
+//try opencl and umat? https://kezunlin.me/post/59afd8b3/
 
 using namespace cv;
 using namespace std;
@@ -38,32 +45,17 @@ void runCamera(cuda::GpuMat base);
 char esc;
 
 
-std::string get_tegra_pipeline(int width, int height, int fps) {
-    return "nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)" + std::to_string(width) + ", height=(int)" +
-            std::to_string(height) + ", format=(string)I420, framerate=(fraction)" + std::to_string(fps) +
-            "/1 ! nvvidconv flip-method=2 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
-}
-
 int main(int argc, char **argv)
 {
 	while (!utils::fs::exists("/dev/video0")) {
 		usleep(500);
 	}
 
-	// Options
-    int  WIDTH = 1920;
-    int  HEIGHT = 1080;
-    int FPS = 30;
-
-    // Define the gstream pipeline
-    std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
-    std::cout << "Using pipeline: \n\t" << pipeline << "\n";
-
 	system("/usr/local/bin/setCam.sh");
 	#ifdef WITH_NETWORK
 	startTable();
 	#endif
-	camera.open(pipeline ,CAP_GSTREAMER);
+	camera.open(0);
 	//display with with camera
 	Mat base;
 	cuda::GpuMat gbase, smol;
@@ -100,15 +92,15 @@ void runCamera(cuda::GpuMat gbase)
 	base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
-	erode(threshed, threshed, kernel); //look into reducing this to one line
-	erode(threshed, threshed, kernel);
+	Thread th1(erode, threshed, threshed, kernel); //look into reducing this to one line
+	Thread th2(erode, threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 
 	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef WITH_HEAD
-	drawContours(base, contours, -1, Scalar(255, 10, 100), 1);
+	Thread th4 (drawContours, base, contours, -1, Scalar(255, 10, 100), 1);
 	#endif
 
 
@@ -176,6 +168,10 @@ void runCamera(cuda::GpuMat gbase)
 		cout << " " << endl;
 
 	}
+
+	th1.join();
+	th2.join();
+	th4.join();
 
 	//show final images
 	#ifdef WITH_HEAD
