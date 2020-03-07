@@ -92,15 +92,15 @@ void runCamera(cuda::GpuMat gbase)
 	base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
-	Thread th1(erode, threshed, threshed, kernel); //look into reducing this to one line
-	Thread th2(erode, threshed, threshed, kernel);
+	thread th1(erode, threshed, threshed, kernel); //look into reducing this to one line
+	thread th2(erode, threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 
 	//contours
 	findContours(threshed, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 	#ifdef WITH_HEAD
-	Thread th4 (drawContours, base, contours, -1, Scalar(255, 10, 100), 1);
+	thread th4 (drawContours, base, contours, -1, Scalar(255, 10, 100), 1);
 	#endif
 
 
