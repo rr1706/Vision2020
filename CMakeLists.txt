@@ -4,6 +4,7 @@ project( vision2020 )
 option(HEAD "Run the program without the GUI" ON)
 option(NETWORK "Control networking on or off (uses Network Tables)" OFF)
 option(NETWORK_UDP "Control networking on or off (uses UDP)" OFF)
+option(WEBSTREAM "opens up a webstream that can be accesed at {unknown}" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,6 +27,10 @@ endif(HEAD)
 if(NETWORK_UDP)
     add_definitions(-DWITH_NETWORK_UDP)
 endif(NETWORK_UDP)
+
+if(WEBSTREAM)
+    add_definitions(-DWITH_WEBSTREAM)
+endif(WEBSTREAM)
 
 if(NETWORK)
     add_definitions(-DWITH_NETWORK)

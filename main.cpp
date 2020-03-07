@@ -4,19 +4,25 @@
 //#include "opencv2/opencv.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/core.hpp"
-#ifdef WITH_HEAD
-#include "opencv2/highgui.hpp"
-#endif
+#include "Functions.hpp"
+#include <opencv2/core/utils/filesystem.hpp>
 #include <thread>
 #include <vector>
 #include <iostream>
-#include "Functions.hpp"
-#include <opencv2/core/utils/filesystem.hpp>
 #include <fstream>
+#include <unistd.h>
+
 #ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
-#include <unistd.h>
+
+#ifdef WITH_HEAD
+#include "opencv2/highgui.hpp"
+#endif
+
+#ifdef WITH_WEBSTREAM
+#include "WebStreamTest.hpp"
+#endif
 //try opencl and umat? https://kezunlin.me/post/59afd8b3/
 
 using namespace cv;
