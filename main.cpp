@@ -21,13 +21,12 @@
 #endif
 
 #ifdef WITH_WEBSTREAM
-#include "WebStreamTest.hpp"
+#include "MJPEGWriter.hpp"
 #endif
 //try opencl and umat? https://kezunlin.me/post/59afd8b3/
 
 using namespace cv;
 using namespace std;
-//using namespace cv::cuda;
 
 VideoCapture camera;
 
@@ -70,7 +69,7 @@ int main(int argc, char **argv)
 		camera >> base;
 		flip(base, base, 0); //only needed if cam is upside down
 		gbase = cuda::GpuMat(base);
-		//cuda::resize(gbase, smol, Size(920,400), 0, 0, INTER_AREA);
+		//cuda::resize(gbase, smol, Size(920,400), 0, 0, INTER_AREA); //changes image size not resolution!
 		thread t(runCamera, gbase);
 		t.join();
 		esc = waitKey(33);
@@ -84,6 +83,10 @@ int main(int argc, char **argv)
 void runCamera(cuda::GpuMat gbase)
 {
 
+	#ifdef WITH_WEBSTREAM
+	MJPEGWriter stream(7777);
+	#endif
+
 	//used for a threshed image
 	cuda::GpuMat gthreshed;
 	Mat base, threshed;
@@ -94,8 +97,7 @@ void runCamera(cuda::GpuMat gbase)
 
 	cuda::cvtColor(gbase, gbase, COLOR_BGR2GRAY);
 	cuda::threshold(gbase, gthreshed,tMin,255,THRESH_BINARY);
-	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
-	//end of cuda :(
+	//cv::adaptiveThreshold(threshed, threshed, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2); //work out adaptive thresh later if needed
 	base = (Mat) gbase;
 	threshed = (Mat) gthreshed;
 
@@ -117,16 +119,15 @@ void runCamera(cuda::GpuMat gbase)
 	for (vector<Point2i> currentContour : contours){
 		//vector<Point2i> c = contours[i];
 		// test contour area
-		if (contourArea(currentContour) < 100 || contourArea(currentContour) > 10000) {
+		if (contourArea(currentContour) < 100 || contourArea(currentContour) > 1000) { //changed max from 10000 to 1000
 			continue;
 		}
-		vector<Point2i> h, p; //make a hull variable and a polygon variable, thinking about re-naming
+		vector<Point2i> h, p; //make a hull variable and a polygon variable
 		convexHull(currentContour, h);
 		approxPolyDP(h, p, 12, true);
 		cout << "POLYGON SIZE " << p.size() << endl;
-
 		#ifdef WITH_HEAD
-		vector<vector<Point2i>> draw{p}; //wraps polygon to be draw in draw contours
+		vector<vector<Point2i>> draw{p}; //wraps polygon to be draw in draw contours method
 		drawContours(base, draw, -1, Scalar(255, 150, 50));
 		#endif
 
@@ -152,7 +153,6 @@ void runCamera(cuda::GpuMat gbase)
 		int imgWidth = base.cols;
 
 		//find and send values
-		//double tY = calculateTY(imgHeight, centerOfTarget, FovY); //find new ty formula
 		double Xrot = calculateXrot(imgWidth, centerOfTarget, FovX);	// maybe find new tx formula
 		double distToTarget = findDistance(17 /*hex height*/, focalLength, boundHeight);
 
@@ -164,7 +164,6 @@ void runCamera(cuda::GpuMat gbase)
 		#ifdef WITH_HEAD
 		putText(base, "Distance: " + to_string(distToTarget),Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,50,200));
 		putText(base, "Xrot: " + to_string(Xrot), Point(20, 90), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
-		//putText(base, "Bound Height: " + to_string(boundHeight), Point(20, 120), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
 		#endif
 
 		#ifdef WITH_NETWORK
@@ -176,6 +175,11 @@ void runCamera(cuda::GpuMat gbase)
 
 	}
 	//show final images
+	#ifdef WITH_WEBSTREAM
+	stream.write(base);
+	stream.start();
+	#endif
+
 	#ifdef WITH_HEAD
 	imshow("Normal", base);
 	//imshow("Thresh", threshed);
