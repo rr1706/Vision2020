@@ -1,3 +1,3 @@
-Rachet Rockers 1706 vision solution for the 2020 year "Infinite Recharge"
+#Rachet Rockers 1706 vision solution for the 2020-21 year "Infinite Recharge"
 
-Using OpenCV and Wpilib NetworkTables this program is meant to track the hexogon target using a coprocceser(jetson nano) and a usb webcam. This will give x rotation from the target alongside distance to the target and distance to the base of the target while using Wpilib NetworkTables to send information back to the RoboRio.
+dependancies: opencv, wpilib

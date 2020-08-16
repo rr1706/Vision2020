@@ -1,12 +1,7 @@
 #ifdef WITH_NETWORK
-#include "ntcore.h"
-#include "networktables/NetworkTable.h"
-#include "string"
+#include <string>
 
-using namespace std;
-using std::shared_ptr;
-
-void sendDouble(string entry, double input);
-void sendString(string entryName, string input);
+void sendDouble(std::string entry, double input);
+void sendString(std::string entryName, std::string input);
 void startTable();
 #endif

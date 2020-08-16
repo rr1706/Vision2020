@@ -1,7 +1,0 @@
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/install/strip.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/edit_cache.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/vision2020.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/rebuild_cache.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/list_install_components.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/install/local.dir
-/home/vision/Documents/Vision2020/cbp/CMakeFiles/install.dir
