@@ -9,6 +9,7 @@
 
 using namespace cv;
 
+
 VideoCapture camera;
 //camera specific
 float focalLength = 1559.29f;
