@@ -1,6 +1,6 @@
 #include "opencv2/opencv.hpp"
 
-//#include <filesystem>
+#include <filesystem>
 #include <unistd.h>
 
 #include "Functions.hpp"
@@ -25,7 +25,7 @@ Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);
 char esc;
 
 
-void runCamera(Mat base) {
+void runCamera(Mat& base) {
 
 	Mat threshed;
 
@@ -59,9 +59,9 @@ void runCamera(Mat base) {
 		convexHull(currentContour, h);
 		approxPolyDP(h, p, 12, true);
 		std::cout << "POLYGON SIZE " << p.size() << std::endl;
-
+		
 		#ifdef WITH_HEAD
-		vector<vector<Point2i>> draw{p}; //wraps polygon to be draw in draw contours
+		std::vector<std::vector<Point2i>> draw{p}; //wraps polygon to be draw in draw contours
 		drawContours(base, draw, -1, Scalar(255, 150, 50));
 		#endif
 
@@ -73,13 +73,13 @@ void runCamera(Mat base) {
 			double Xrot = calculateXrot(base.cols, rotRect.center, FovX);	// maybe find new tx formula
 			double distToTarget = findDistance(heightOfHex, focalLength, rotRect.size.height);
 
-			std::cout << "contour area: " << std::to_string(contourArea(currentContour)) << std::endl;
+			//std::cout << "contour area: " << std::to_string(contourArea(currentContour)) << std::endl;
 			std::cout << "Distance to target (in): " + std::to_string(distToTarget) << std::endl;
 			std::cout << "Xrot: " << Xrot << std::endl;
 
 			#ifdef WITH_HEAD
-			putText(base, "Distance: " + to_string(distToTarget),Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,50,200));
-			putText(base, "Xrot: " + to_string(Xrot), Point(20, 90), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
+			putText(base, "Distance: " + std::to_string(distToTarget), Point(20, 40), FONT_HERSHEY_COMPLEX, 1, Scalar(255,50,200));
+			putText(base, "Xrot: " + std::to_string(Xrot), Point(20, 90), FONT_HERSHEY_COMPLEX, 1, Scalar(255, 50, 200));
 			#endif
 
 			#ifdef WITH_NETWORK
@@ -98,11 +98,11 @@ void runCamera(Mat base) {
 
 int main() {
 	//check if it's possible to get around this
-	//while (!std::filesystem::exist("/dev/video0")) {
-	//	sleep(1);
-	//}
+	while (!std::filesystem::exists("/dev/video0")) {
+		usleep(500);
+	}
 	//sets camera params
-	//std::system("/usr/local/bin/setCam.sh");
+	std::system("/usr/local/bin/setCam.sh");
 	
 	#ifdef WITH_NETWORK
 	startTable();
