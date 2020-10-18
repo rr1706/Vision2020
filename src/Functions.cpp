@@ -1,4 +1,3 @@
-#include <opencv2/opencv.hpp>
 #include "Functions.hpp"
 
 //xrot equation from Emerson (in degrees)

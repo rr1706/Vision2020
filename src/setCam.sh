@@ -1,6 +1,7 @@
 
 #!/bin/sh
 #check camera parameters 
+#find a way to include this in the code
 
 /usr/bin/v4l2-ctl -c brightness=-64
 /usr/bin/v4l2-ctl -c contrast=95

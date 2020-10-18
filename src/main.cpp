@@ -1,8 +1,9 @@
 #include "opencv2/opencv.hpp"
-#include "Functions.hpp"
-#include <opencv2/core/utils/filesystem.hpp>
+
+//#include <filesystem>
 #include <unistd.h>
-#include <thread>
+
+#include "Functions.hpp"
 #ifdef WITH_NETWORK
 #include "Network.hpp"
 #endif
@@ -12,29 +13,28 @@ using namespace cv;
 
 VideoCapture camera;
 //camera specific
-float focalLength = 1559.29f;
+const float focalLength = 1559.29f;
 //size of the target
-float widthOfHex = 39.25f;
-int heightOfHex = 17;
+const float widthOfHex = 39.25f;
+const int heightOfHex = 17;
 //fov of the camera (check again)
-int FovX = 120;
+const int FovX = 120;
 //3x3 black and white image used for erode dialate
 Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);
 //press esc key to close program
 char esc;
 
 
-void runCamera(Mat base)
-{
+void runCamera(Mat base) {
 
 	Mat threshed;
 
 	//used in contours
-	std::vector <std::vector<Point2i> > contours;
+	std::vector <std::vector<Point2i>> contours;
 	std::vector <Vec4i> hierarchy;
 
 	cvtColor(base, base, COLOR_BGR2GRAY);
-	threshold(base, threshed,30,255,THRESH_BINARY);
+	threshold(base, threshed, 30, 255, THRESH_BINARY);
 
 	erode(threshed, threshed, kernel); //look into reducing this to one line
 	erode(threshed, threshed, kernel);
@@ -96,12 +96,11 @@ void runCamera(Mat base)
 	#endif
 }
 
-int main()
-{
+int main() {
 	//check if it's possible to get around this
-	while (!utils::fs::exists("/dev/video0")) {
-		usleep(500);
-	}
+	//while (!std::filesystem::exist("/dev/video0")) {
+	//	sleep(1);
+	//}
 	//sets camera params
 	std::system("/usr/local/bin/setCam.sh");
 	
@@ -117,7 +116,7 @@ int main()
 	while (camera.isOpened()) {
 
 		camera >> base;
-		flip(base, base, 0); //only needed if cam is upside down
+		//flip(base, base, 0); //only needed if cam is upside down
 		runCamera(base);
 		
 		esc = waitKey(33);

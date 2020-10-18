@@ -1,4 +1,0 @@
-- change to using sockets for data transfer rather then nt
-- re-enable cuda (but better this time)
-- add video webstream
-- make a better README
