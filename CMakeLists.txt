@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package( OpenCV REQUIRED )
 find_package( Threads REQUIRED )
-find_package( wpilib REQUIRED )
+#find_package( wpilib REQUIRED )
 
 if(CUDA_VERSION)
     add_definitions(-DWITH_CUDA)
@@ -31,7 +31,7 @@ endif(NETWORK)
 file(GLOB srcs src/*.cpp src/*.hpp)
 
 add_executable( vision2020 ${srcs} )
-target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} ntcore )
+target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} ) #ntcore
 
-install(TARGETS vision2020 RUNTIME DESTINATION bin)
-install(FILES vision.service DESTINATION /lib/systemd/system)
+#install(TARGETS vision2020 RUNTIME DESTINATION bin)
+#install(FILES vision.service DESTINATION /lib/systemd/system)

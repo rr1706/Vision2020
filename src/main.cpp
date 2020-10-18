@@ -1,6 +1,7 @@
 #include "opencv2/opencv.hpp"
 
 #include <filesystem>
+#include <opencv2/core/cuda.hpp>
 #include <unistd.h>
 
 #include "Functions.hpp"
@@ -21,14 +22,11 @@ const int heightOfHex = 17;
 const int FovX = 120;
 //3x3 black and white image used for erode dialate
 Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);
-//press esc key to close program
-char esc;
 
 
-void runCamera(Mat& base) {
+void runCamera(cuda::GpuMat& base) {
 
-	Mat threshed;
-
+	cuda::GpuMat threshed;
 	//used in contours
 	std::vector <std::vector<Point2i>> contours;
 	std::vector <Vec4i> hierarchy;
@@ -97,30 +95,33 @@ void runCamera(Mat& base) {
 }
 
 int main() {
+	
+	//press esc key to close program
+	char esc;
+	//holds base image
+	cuda::GpuMat base;
 	//check if it's possible to get around this
 	while (!std::filesystem::exists("/dev/video0")) {
 		usleep(500);
 	}
-	//sets camera params
-	std::system("/usr/local/bin/setCam.sh");
-	
+	//initalizes network table
 	#ifdef WITH_NETWORK
 	startTable();
 	#endif
-
+	//camera parameters
+	std::system("/usr/local/bin/setCam.sh");
 	camera.open(0);
 	camera.set(CAP_PROP_FRAME_WIDTH, 640);
     camera.set(CAP_PROP_FRAME_HEIGHT, 480);
-	//display with with camera
-	Mat base;
-	while (camera.isOpened()) {
 
-		camera >> base;
+	while (camera.isOpened()) {
+		camera.read(base); 
 		//flip(base, base, 0); //only needed if cam is upside down
 		runCamera(base);
 		
 		esc = waitKey(33);
 		if (esc == 27) {
+			camera.release();
 			break;
 		}
 	}

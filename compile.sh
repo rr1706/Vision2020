@@ -1,5 +1,7 @@
 #!/bin/sh
-#param: head(on/off), network(on/off), install(0/1)
+#param: head(ON/OFF), network(ON/OFF)
+
+#TODO: make this use proper paths
 
 sudo rm --dir -r build
 mkdir build
