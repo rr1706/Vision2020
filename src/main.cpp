@@ -102,7 +102,7 @@ int main() {
 	//	sleep(1);
 	//}
 	//sets camera params
-	std::system("/usr/local/bin/setCam.sh");
+	//std::system("/usr/local/bin/setCam.sh");
 	
 	#ifdef WITH_NETWORK
 	startTable();
