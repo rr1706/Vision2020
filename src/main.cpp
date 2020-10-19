@@ -24,7 +24,6 @@ Mat kernel = (cv::Mat_ < unsigned char >(3, 3) << 1,0, 1, 0, 1, 0, 1, 0, 1);
 //press esc key to close program
 char esc;
 
-
 void runCamera(Mat& base) {
 
 	Mat threshed;
@@ -83,8 +82,8 @@ void runCamera(Mat& base) {
 			#endif
 
 			#ifdef WITH_NETWORK
-			sendDouble("Xrot", Xrot);
-			sendDouble("Distance", distToTarget);
+			Net.sendDouble("Xrot", Xrot);
+			Net.sendDouble("Distance", distToTarget);
 			#endif
 		}
 	}
@@ -101,16 +100,16 @@ int main() {
 	while (!std::filesystem::exists("/dev/video0")) {
 		usleep(500);
 	}
-	//sets camera params
-	std::system("/usr/local/bin/setCam.sh");
 	
 	#ifdef WITH_NETWORK
-	startTable();
+	//sets network table default values
+	Network Net;
+	Net.init();
 	#endif
 
 	camera.open(0);
-	camera.set(CAP_PROP_FRAME_WIDTH, 640);
-    camera.set(CAP_PROP_FRAME_HEIGHT, 480);
+	setCam(camera);
+
 	//display with with camera
 	Mat base;
 	while (camera.isOpened()) {

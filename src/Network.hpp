@@ -1,7 +1,18 @@
-#ifdef WITH_NETWORK
+#pragma once
+
+#include <iostream>
 #include <string>
 
-void sendDouble(std::string entry, double input);
-void sendString(std::string entryName, std::string input);
-void startTable();
-#endif
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableInstance.h"
+#include "ntcore.h"
+
+class Network{
+  public:
+    void sendDouble(std::string entry, double input);
+    void sendString(std::string entryName, std::string input);
+    void init();
+  
+  private:
+    std::shared_ptr<NetworkTable> myTable;
+};
