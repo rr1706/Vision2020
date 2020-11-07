@@ -1,9 +1,14 @@
-//#include "WebStream.hpp"
-//
-//
-//void WebStream::init(cv::Mat base){
-//
-//    /* VideoWriter: 'videoconvert' converts the 'BGR' images into 'YUY2' raw frames to be fed to
-//    'jpegenc' encoder since 'jpegenc' does not accept 'BGR' images.*/
-//    WebStream::out = (base, cv::CAP_GSTREAMER, 0, 30, cv::Size(640,480), true);
-//}
+#include "WebStream.hpp"
+#include <opencv2/videoio.hpp>
+
+WebStream::WebStream(){
+    cv::VideoWriter out("./video.avi", cv::VideoWriter::fourcc('M','J','P','G'), 30.0, cv::Size(640, 480));
+}
+
+WebStream::~WebStream(){
+    out.release();
+}
+
+void WebStream::write(cv::Mat base){
+    WebStream::out.write(base);
+}

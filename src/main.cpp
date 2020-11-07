@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <unistd.h>
 
+#include "WebStream.hpp"
 #include "Functions.hpp"
 #ifdef WITH_NETWORK
 #include "Network.hpp"
@@ -107,6 +108,9 @@ int main() {
 	Net.init();
 	#endif
 
+	//testing
+	WebStream Stream;
+
 	camera.open(0);
 	setCam(camera);
 
@@ -116,10 +120,12 @@ int main() {
 
 		camera >> base;
 		//flip(base, base, 0); //only needed if cam is upside down
+		Stream.write(base);
 		runCamera(base);
 		
 		esc = waitKey(33);
-		if (esc == 27) {
+		if (esc == 27) { // TODO: have this properly decontruct everything when it closes
+			camera.release();
 			break;
 		}
 	}

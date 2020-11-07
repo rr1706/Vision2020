@@ -1,6 +1,9 @@
 build/
+Build/
 cbp/
 .vscode/
 *~
 *.swp*
 .clangd
+*.mp4
+*.avi

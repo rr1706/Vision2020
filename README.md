@@ -1,11 +1,13 @@
-### Rachet Rockers 1706  ###
+### Rachet Rockers 1706 Vision Solution 2020-21 ###
 
-vision solution for the 2020-21 year _"Infinite Recharge"_
+Vision solution for the 2020-21 year _"Infinite Recharge"_.
+
+Add your name after one of the TODO's to claim it.
 
 TODO: 
- -  change to using something else for data transfer rather then NT
- -  add Cuda/OpenCL
- -  try multithreading
- -  add video webstream
- -  make a better README
+ -  rewrite network class to use CAN:
+ -  add Cuda/OpenCL:
+ -  try multithreadin: 
+ -  add video webstream: Will
+ -  make a better README: Will
 
