@@ -35,7 +35,7 @@ void runCamera(Mat& base) {
 	cvtColor(base, base, COLOR_BGR2GRAY);
 	threshold(base, threshed, 30, 255, THRESH_BINARY);
 
-	erode(threshed, threshed, kernel); //look into reducing this to one line
+	erode(threshed, threshed, kernel);
 	erode(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);
 	dilate(threshed, threshed, kernel);

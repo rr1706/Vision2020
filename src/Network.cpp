@@ -11,9 +11,11 @@ void Network::init(){
 
 void Network::sendDouble(std::string entryName, double input) {
   	Network::myTable->PutNumber(entryName, input);
+	Network::myTable->flush();
 }
 
 void Network::sendString(std::string entryName, std::string input) {
   	Network::myTable->PutString(entryName, input);
+	Network::myTable->flush();
 }
 #endif // WITH_NETWORK
