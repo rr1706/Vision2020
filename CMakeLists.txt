@@ -28,7 +28,7 @@ if(NETWORK)
     add_definitions(-DWITH_NETWORK)
 endif(NETWORK)
 
-file(GLOB srcs src/*.cpp src/*.hpp)
+file(GLOB srcs src/*.cpp src/headers/*.hpp)
 
 add_executable( vision2020 ${srcs} )
 target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} ) #ntcore
