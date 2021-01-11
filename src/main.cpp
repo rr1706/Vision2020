@@ -10,7 +10,7 @@
 
 using namespace cv;
 
-
+#define PORT 8000
 VideoCapture camera;
 // camera specific
 const float focalLength = 1559.29f;
