@@ -1,17 +1,16 @@
 // basically save a file then push file to network
 #pragma once
 
+#include "opencv2/opencv.hpp"
+
 class Webstream {
 	public:
 	Webstream();
 	~Webstream();
 
+    void sendFrame(Mat frame);
 	void bindSocket( const char *address, int port );
 
-
-	// memset( buf, 0, 4096 );
-
 	private:
-	int server;
-	char buf[4096];
+	int sock;
 };

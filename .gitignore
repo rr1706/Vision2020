@@ -4,6 +4,7 @@ cbp/
 .vscode/
 *~
 *.swp*
-.clangd
+.clangd/
 *.mp4
 *.avi
+.cache/
