@@ -1,6 +1,7 @@
 #include "headers/Functions.hpp"
 #include "headers/WebStream.hpp"
-#include "opencv2/opencv.hpp"
+
+#include <opencv4/opencv2/opencv.hpp>
 
 #include <filesystem>
 #include <unistd.h>
@@ -107,7 +108,7 @@ int main() {
 #endif
 
 	// testing
-	WebStream Stream;
+//	WebStream Stream;
 
 	camera.open( 0 );
 	setCam( camera );
@@ -117,7 +118,7 @@ int main() {
 	while( camera.isOpened() ) {
 		camera >> base;
 		// flip(base, base, 0); //only needed if cam is upside down
-		Stream.write( base );
+//		Stream.write( base );
 		runCamera( base );
 
 		esc = waitKey( 33 );
