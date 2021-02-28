@@ -1,3 +1,4 @@
+# Server
 require 'socket'                 # Get sockets from stdlib
 
 port = 8000

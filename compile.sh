@@ -6,7 +6,7 @@ echo "-DNETWORK=$2"
 
 rm -rf build
 mkdir build
-pkill vision
+#pkill vision
 cd build
 cmake .. -DHEAD=$1 -DNETWORK=$2 -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 make -j$nproc

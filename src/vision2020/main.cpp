@@ -1,12 +1,14 @@
-#include "headers/Functions.hpp"
-#include "headers/WebStream.hpp"
-
-#include <opencv4/opencv2/opencv.hpp>
+#include "Functions.hpp"
+#include "opencv4/opencv2/core.hpp"
+#include "opencv4/opencv2/highgui.hpp"
+#include "opencv4/opencv2/imgproc.hpp"
+#include "opencv4/opencv2/video.hpp"
 
 #include <filesystem>
 #include <unistd.h>
+
 #ifdef WITH_NETWORK
-	#include "headers/Network.hpp"
+	#include "Network.hpp"
 #endif
 
 using namespace cv;
@@ -108,7 +110,7 @@ int main() {
 #endif
 
 	// testing
-//	WebStream Stream;
+	//	WebStream Stream;
 
 	camera.open( 0 );
 	setCam( camera );
@@ -118,7 +120,7 @@ int main() {
 	while( camera.isOpened() ) {
 		camera >> base;
 		// flip(base, base, 0); //only needed if cam is upside down
-//		Stream.write( base );
+		//		Stream.write( base );
 		runCamera( base );
 
 		esc = waitKey( 33 );
