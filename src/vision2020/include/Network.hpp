@@ -9,9 +9,9 @@
 
 class Network{
   public:
+    Network();
     void sendDouble(std::string entry, double input);
     void sendString(std::string entryName, std::string input);
-    void init();
   
   private:
     std::shared_ptr<NetworkTable> myTable;
