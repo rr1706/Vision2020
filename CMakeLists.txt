@@ -30,9 +30,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ###############################################################################
 
+find_package( Poco REQUIRED Foundation Net CONFIG )
 find_package( OpenCV REQUIRED )
 find_package( Threads REQUIRED )
-find_package( Ruby REQUIRED )
 if(WITH_NETWORK)
     find_package( wpilib REQUIRED )
 endif()
@@ -42,11 +42,11 @@ endif()
 file(GLOB srcs src/vision2020/*.cpp)
 add_executable( vision2020 ${srcs} )
 
-target_include_directories( vision2020 PRIVATE ${RUBY_INCLUDE_DIRS} src/vision2020/include/ )
+target_include_directories( vision2020 PRIVATE src/vision2020/include/ )
 if(WITH_NETWORK)
-    target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} ntcore )
+	target_link_libraries( vision2020 ${OpenCV_LIBS} Poco::Foundation Poco::Net ${CMAKE_THREAD_LIBS_INIT} ntcore )
 else()
-    target_link_libraries( vision2020 ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+    target_link_libraries( vision2020 ${OpenCV_LIBS} Poco::Foundation Poco::Net ${CMAKE_THREAD_LIBS_INIT} )
 endif()
 
 ###############################################################################

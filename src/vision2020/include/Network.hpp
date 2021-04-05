@@ -3,9 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableInstance.h"
-#include "ntcore.h"
+#include "Poco/Net/SocketAddress.h"
 
 class Network{
   public:

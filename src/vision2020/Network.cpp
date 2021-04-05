@@ -1,6 +1,5 @@
 #ifdef WITH_NETWORK
-#include "headers/Network.hpp"
-#include "lua.h"
+#include "include/Network.hpp"
 
 /*
 void Network::Network() {
@@ -21,22 +20,4 @@ void Network::sendString( std::string entryName, std::string input ) {
 	Network::myTable->flush();
 }
 */
-
-void Network::Network() {
-    
-    lua_State *l;
-    l = lua_open();
-    lua_dofile(l, "sockets.lua");    
-    lua_close(l);
-    
-}
-
-void Network::sendDouble( std::string entryName, double input ) {
-	
-}
-
-void Network::sendString( std::string entryName, std::string input ) {
-	
-}
-
 #endif // WITH_NETWORK
